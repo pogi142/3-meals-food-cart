@@ -1,134 +1,210 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>3 Meal's Food Cart</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial;
-      margin: 0;
-      background: #f5f5f5;
-    }
+<meta charset="UTF-8">
+<title>3 Meal's Food Cart</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    header {
-      background: #ff3c3c;
-      color: white;
-      text-align: center;
-      padding: 15px;
-    }
+<style>
+body {
+    font-family: Arial;
+    margin: 0;
+    background: #fff5e6;
+}
 
-    header img {
-      width: 100px;
-    }
+/* HEADER */
+header {
+    background: #d62828;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
 
-    .search {
-      padding: 10px;
-      text-align: center;
-    }
+/* SEARCH BAR */
+.search {
+    padding: 10px;
+    text-align: center;
+}
 
-    input {
-      padding: 10px;
-      width: 80%;
-      max-width: 300px;
-    }
+.search input {
+    width: 80%;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+}
 
-    .menu {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-      padding: 10px;
-    }
+/* MENU */
+.menu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
 
-    .item {
-      background: white;
-      padding: 10px;
-      border-radius: 10px;
-      text-align: center;
-    }
+.item {
+    background: white;
+    margin: 10px;
+    padding: 15px;
+    border-radius: 10px;
+    width: 150px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.3s;
+}
 
-    button {
-      background: green;
-      color: white;
-      border: none;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 5px;
-    }
+.item:hover {
+    transform: scale(1.05);
+}
 
-    .cart {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: white;
-      padding: 10px;
-      border-top: 2px solid #ccc;
-    }
+button {
+    background: #f77f00;
+    border: none;
+    padding: 8px;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
-    .checkout {
-      background: orange;
-      width: 100%;
-    }
-  </style>
+/* CART */
+.cart {
+    background: #003049;
+    color: white;
+    padding: 15px;
+}
+
+input, select {
+    padding: 8px;
+    margin: 5px;
+}
+
+/* RECEIPT */
+#receipt {
+    background: white;
+    padding: 10px;
+    margin-top: 10px;
+    display: none;
+}
+
+/* ANIMATION */
+.fade {
+    animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <img src="logo.png">
-  <h1>3 Meal's Food Cart</h1>
+<h1>🍔 3 Meal's Food Cart</h1>
 </header>
 
+<!-- SEARCH -->
 <div class="search">
-  <input type="text" id="search" placeholder="Search food..." onkeyup="searchFood()">
+<input type="text" id="search" placeholder="Search food..." onkeyup="searchFood()">
 </div>
 
+<!-- MENU -->
 <div class="menu" id="menu">
-
-  <div class="item">
-    <h3>Lumpiang Shanghai</h3>
-    <p>₱50</p>
-    <button onclick="addToCart('Lumpiang Shanghai',50)">Add</button>
-  </div>
-
-  <div class="item">
-    <h3>Chicken Pastil Rice</h3>
-    <p>₱60</p>
-    <button onclick="addToCart('Chicken Pastil Rice',60)">Add</button>
-  </div>
-
-  <div class="item">
-    <h3>Siomai Rice</h3>
-    <p>₱45</p>
-    <button onclick="addToCart('Siomai Rice',45)">Add</button>
-  </div>
-
+<div class="item fade">
+<h3>Burger</h3>
+<p>₱50</p>
+<button onclick="addToCart('Burger',50)">Add</button>
 </div>
 
+<div class="item fade">
+<h3>Fries</h3>
+<p>₱30</p>
+<button onclick="addToCart('Fries',30)">Add</button>
+</div>
+
+<div class="item fade">
+<h3>Hotdog</h3>
+<p>₱40</p>
+<button onclick="addToCart('Hotdog',40)">Add</button>
+</div>
+</div>
+
+<!-- CART / CHECKOUT -->
 <div class="cart">
-  <h3>Cart: ₱<span id="total">0</span></h3>
-  <button class="checkout" onclick="checkout()">Checkout (GCash)</button>
+<h2>🛒 Cart</h2>
+
+Name: <input type="text" id="name"><br>
+
+<ul id="cartList"></ul>
+
+Total: ₱<span id="total">0</span><br><br>
+
+<button onclick="checkout()">Checkout</button>
+
+<!-- RECEIPT -->
+<div id="receipt"></div>
+
+<!-- QR PAYMENT -->
+<h3>📱 Pay with GCash</h3>
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=09525766589">
+
+<h3>🌐 Visit Website</h3>
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://pogi142.github.io/3-meals-food-cart/">
 </div>
 
 <script>
+let cart = [];
 let total = 0;
 
 function addToCart(name, price) {
-  total += price;
-  document.getElementById("total").innerText = total;
+    cart.push({name, price});
+    total += price;
+    updateCart();
+}
+
+function updateCart() {
+    let list = document.getElementById("cartList");
+    list.innerHTML = "";
+
+    cart.forEach(item => {
+        let li = document.createElement("li");
+        li.textContent = item.name + " - ₱" + item.price;
+        list.appendChild(li);
+    });
+
+    document.getElementById("total").textContent = total;
 }
 
 function checkout() {
-  alert("Send payment to GCash: 09525-76659\nTotal: ₱" + total);
+    let name = document.getElementById("name").value;
+
+    if(name === "") {
+        alert("Enter your name!");
+        return;
+    }
+
+    let receipt = document.getElementById("receipt");
+    receipt.style.display = "block";
+
+    let items = cart.map(i => i.name).join(", ");
+
+    receipt.innerHTML = `
+        <h3>🧾 Receipt</h3>
+        Name: ${name}<br>
+        Items: ${items}<br>
+        Total: ₱${total}<br>
+        Contact: 09525766589
+    `;
 }
 
+/* SEARCH FUNCTION */
 function searchFood() {
-  let input = document.getElementById("search").value.toLowerCase();
-  let items = document.getElementsByClassName("item");
+    let input = document.getElementById("search").value.toLowerCase();
+    let items = document.querySelectorAll(".item");
 
-  for (let i = 0; i < items.length; i++) {
-    let text = items[i].innerText.toLowerCase();
-    items[i].style.display = text.includes(input) ? "block" : "none";
-  }
+    items.forEach(item => {
+        let text = item.innerText.toLowerCase();
+        item.style.display = text.includes(input) ? "" : "none";
+    });
 }
 </script>
 
