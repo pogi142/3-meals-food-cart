@@ -2,35 +2,49 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Food Cart Order</title>
+<title>3 Meals Food Cart</title>
 
 <style>
 body {
-  font-family: Arial;
+  font-family: 'Poppins', sans-serif;
   background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  margin: 0;
   text-align: center;
-  color: #333;
 }
 
 .container {
-  margin: 20px;
-  padding: 20px;
   background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 25px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+h1 {
+  color: white;
+  padding-top: 20px;
 }
 
 button {
-  padding: 12px 20px;
+  padding: 10px 15px;
+  margin: 5px;
   border: none;
-  border-radius: 10px;
+  border-radius: 20px;
   background: #ff5e62;
   color: white;
-  font-size: 16px;
   cursor: pointer;
 }
 
 button:hover {
+  transform: scale(1.1);
   background: #ff2e35;
 }
 
@@ -38,64 +52,122 @@ button:hover {
   display: none;
 }
 
-img {
-  border-radius: 10px;
+.total {
+  font-size: 18px;
+  font-weight: bold;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🍔 3 Meals Food Cart</h1>
+<h1>🍱 3 Meals Food Cart</h1>
 
+<!-- MENU -->
 <div class="container">
-  <h2>Step 1: Pay First</h2>
-  <p>Scan the QR below and send payment</p>
+  <h2>Menu</h2>
 
-  <img src="gcash.png" width="200"><br><br>
+  <p>Lumpiang Shanghai Rice - ₱60</p>
+  <button onclick="addToCart('Lumpiang Shanghai Rice',60)">Add</button>
 
-  <input type="file" id="proof">
-  <p>Upload your payment screenshot</p>
+  <p>Chicken Pastil Rice - ₱70</p>
+  <button onclick="addToCart('Chicken Pastil Rice',70)">Add</button>
 
-  <button onclick="verifyPayment()">I Paid</button>
+  <p>Siomai Rice - ₱50</p>
+  <button onclick="addToCart('Siomai Rice',50)">Add</button>
 </div>
 
-<div class="container hidden" id="orderSection">
-  <h2>Step 2: Place Order</h2>
+<!-- CART -->
+<div class="container">
+  <h2>Your Cart 🛒</h2>
+  <p id="cartList">Empty</p>
+  <p class="total">₱<span id="total">0</span></p>
 
-  <input type="text" id="name" placeholder="Your Name"><br><br>
-  <input type="text" id="order" placeholder="Your Order"><br><br>
+  <button onclick="checkout()">Checkout</button>
+</div>
 
-  <button onclick="submitOrder()">Submit Order</button>
+<!-- PAYMENT -->
+<div class="container hidden" id="paymentBox">
+  <h2>Choose Payment</h2>
+
+  <button onclick="choosePayment('cash')">💵 Cash</button>
+  <button onclick="choosePayment('gcash')">📱 GCash</button>
+</div>
+
+<!-- GCASH -->
+<div class="container hidden" id="gcashBox">
+  <h2>Scan & Pay</h2>
+
+  <img src="gcash.png" width="180"><br><br>
+
+  <input type="file" id="proof"><br><br>
+
+  <button onclick="confirmGCash()">Confirm Payment</button>
+</div>
+
+<!-- CONFIRM -->
+<div class="container hidden" id="confirmBox">
+  <h2>🎉 Order Confirmed</h2>
+  <p id="orderDetails"></p>
 </div>
 
 <script>
-function verifyPayment() {
-  let file = document.getElementById("proof").files[0];
+let cart = [];
+let total = 0;
 
-  if (!file) {
-    alert("Please upload payment proof first!");
-    return;
-  }
+function addToCart(item, price) {
+  cart.push(item);
+  total += price;
 
-  alert("Payment received! You can now order.");
-  document.getElementById("orderSection").classList.remove("hidden");
+  document.getElementById("cartList").innerText = cart.join(", ");
+  document.getElementById("total").innerText = total;
 }
 
-function submitOrder() {
-  let name = document.getElementById("name").value;
-  let order = document.getElementById("order").value;
-
-  if (name === "" || order === "") {
-    alert("Please fill in all fields!");
+function checkout() {
+  if(cart.length === 0){
+    alert("Cart is empty!");
     return;
   }
 
-  alert("Order sent! Please wait for confirmation.");
+  document.getElementById("paymentBox").classList.remove("hidden");
+}
 
-  // OPTIONAL: Play sound
-  let audio = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
-  audio.play();
+function choosePayment(type) {
+  if(type === "cash"){
+    finalizeOrder("Cash");
+  } else {
+    document.getElementById("gcashBox").classList.remove("hidden");
+  }
+}
+
+function confirmGCash() {
+  let file = document.getElementById("proof").files[0];
+
+  if(!file){
+    alert("Upload proof first!");
+    return;
+  }
+
+  finalizeOrder("GCash Paid");
+}
+
+function generateOrderID() {
+  return "ORD-" + Math.floor(Math.random() * 1000000);
+}
+
+function finalizeOrder(payment) {
+  let orderID = generateOrderID();
+
+  document.getElementById("confirmBox").classList.remove("hidden");
+
+  document.getElementById("orderDetails").innerText =
+    "Order ID: " + orderID +
+    "\nItems: " + cart.join(", ") +
+    "\nTotal: ₱" + total +
+    "\nPayment: " + payment;
+
+  let sound = new Audio("https://www.soundjay.com/buttons/sounds/button-09.mp3");
+  sound.play();
 }
 </script>
 
