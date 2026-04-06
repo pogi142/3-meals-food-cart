@@ -1,213 +1,227 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>3 Meal's Food Cart</title>
+
 <style>
-body{font-family:'Poppins',sans-serif;margin:0;background:linear-gradient(270deg,#ff9a9e,#fad0c4,#fbc2eb,#a6c1ee);background-size:600% 600%;animation:bg 12s ease infinite}
-@keyframes bg{0%{background-position:0%}50%{background-position:100%}100%{background-position:0%}}
-#welcome{position:fixed;width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#ff6f61;color:white;font-size:35px;z-index:10;animation:fadeOut 1s forwards;animation-delay:3s}
-@keyframes fadeOut{to{opacity:0;visibility:hidden}}
-.container{padding:20px}
-.menu-item{background:white;margin:10px;padding:15px;border-radius:20px;display:flex;justify-content:space-between;box-shadow:0 10px 20px rgba(0,0,0,0.2)}
-button{padding:10px;border:none;border-radius:15px;background:#ff6f61;color:white;cursor:pointer}
-.cart{background:white;padding:20px;border-radius:20px;margin-top:20px;box-shadow:0 10px 20px rgba(0,0,0,0.2)}
-input,select,textarea{width:100%;padding:10px;margin:8px 0;border-radius:10px}
-.receipt{background:white;padding:20px;margin-top:20px;border-radius:20px}
-.map{margin-top:20px;height:200px;background:#eee;border-radius:20px;position:relative;overflow:hidden}
-.rider{position:absolute;font-size:30px;left:0;top:50%;transform:translateY(-50%)}
-.bubble{position:fixed;bottom:-50px;background:rgba(255,255,255,0.4);border-radius:50%;animation:float 10s infinite}
-@keyframes float{to{transform:translateY(-100vh)}}
+body {
+  margin: 0;
+  font-family: Poppins;
+  background: linear-gradient(135deg,#d9a7c7,#fffcdc);
+}
+
+/* Welcome */
+#welcome {
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
+#welcome h1 {
+  font-size:40px;
+}
+button {
+  padding:10px 20px;
+  border:none;
+  border-radius:20px;
+  background:#ff6f61;
+  color:white;
+}
+
+/* Main */
+#main { display:none; padding:15px; }
+
+.card {
+  background:white;
+  padding:10px;
+  border-radius:20px;
+  margin:10px 0;
+}
+
+/* Cart */
+#cartBox {
+  background:white;
+  padding:15px;
+  border-radius:20px;
+  margin-top:20px;
+}
+input, select {
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+/* QR */
+#qrModal {
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+#qrBox {
+  background:white;
+  padding:20px;
+  border-radius:20px;
+  text-align:center;
+}
 </style>
 </head>
+
 <body>
-<div id="welcome">🍽️ Welcome to 3 Meal's Food Cart 🍽️</div>
-<div class="container">
+
+<!-- WELCOME -->
+<div id="welcome">
+  <h1>🍔 3 Meal's Food Cart</h1>
+  <p>"Good food, good mood!"</p>
+  <button onclick="start()">Start Order</button>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
 <h2>Menu</h2>
-<div id="menu"></div><div class="cart">
-<h2>Cart</h2>
-<div id="cartItems"></div>
-<p>Total: ₱<span id="total">0</span></p><h3>Customer Info</h3>
+<div id="menu"></div>
+
+<div id="cartBox">
+<h3>Cart</h3>
+<p id="cartItems"></p>
+<p><b>Total: ₱<span id="total">0</span></b></p>
+
+<h3>Customer Info</h3>
 <input id="name" placeholder="Full Name">
 <input id="phone" placeholder="Phone">
-<textarea id="address" placeholder="Address"></textarea><select id="delivery">
-<option value="pickup">Pick Up</option>
-<option value="delivery">Delivery (+₱5)</option>
-</select><select id="payment" onchange="showGCash()">
-<option value="cash">Cash</option>
-<option value="gcash">GCash</option>
-</select><div id="gcashBox" style="display:none">
-<p><strong>Scan & Pay using GCash</strong></p>
-<img src="gcash.png" width="180">
-<p style="color:red;">⚠️ Pay FIRST before confirming order</p>
-</div><button onclick="checkout()">Order Now</button>
+<input id="address" placeholder="Address">
 
-</div><div class="receipt" id="receipt" style="display:none"></div><div class="map" id="map" style="display:none">
-<div id="rider" class="rider">🛵</div>
-</div></div><script>
-const menu=[
-{name:"Lumpiang Shanghai Rice",price:60},
-{name:"Chicken Pastil Rice",price:70},
-{name:"Siomai Rice",price:50}
+<select id="delivery">
+  <option value="0">Pick Up</option>
+  <option value="10">Delivery (+₱10)</option>
+</select>
+
+<select id="payment">
+  <option>GCash</option>
+</select>
+
+<button onclick="checkout()">Order Now</button>
+</div>
+
+</div>
+
+<!-- QR -->
+<div id="qrModal">
+  <div id="qrBox">
+    <h3>Pay First (GCash)</h3>
+    <img src="gcash.png" width="200"><br><br>
+    <button onclick="paid()">I Paid</button>
+  </div>
+</div>
+
+<script>
+
+/* PRODUCTS + INVENTORY */
+const products = [
+  {name:"Lumpiang Shanghai", price:50, stock:10},
+  {name:"Rice", price:20, stock:20},
+  {name:"Chicken Pastil", price:60, stock:10},
+  {name:"Siomai Rice", price:70, stock:10}
 ];
 
-let cart=[];
+let cart = [];
+let total = 0;
+let timer;
 
-function displayMenu(){
-const menuDiv=document.getElementById("menu");
-menuDiv.innerHTML=""; // FIX: clear first
-menu.forEach((item,i)=>{
-menuDiv.innerHTML += `
-<div class="menu-item">
-<span>${item.name} - ₱${item.price}</span>
-<button onclick="addToCart(${i})">Add</button>
-</div>`;
-});
+/* START */
+function start(){
+  document.getElementById("welcome").style.display="none";
+  document.getElementById("main").style.display="block";
+  loadMenu();
 }
 
-function addToCart(i){cart.push(menu[i]);updateCart();}
+/* LOAD MENU */
+function loadMenu(){
+  let menu = document.getElementById("menu");
+  menu.innerHTML = "";
 
+  products.forEach((p,i)=>{
+    menu.innerHTML += `
+      <div class="card">
+        <h3>${p.name}</h3>
+        <p>₱${p.price}</p>
+        <p>Stock: ${p.stock}</p>
+        <button onclick="add(${i})">Add</button>
+      </div>
+    `;
+  });
+}
+
+/* ADD TO CART */
+function add(i){
+  if(products[i].stock <= 0){
+    alert("Out of stock!");
+    return;
+  }
+
+  cart.push(products[i]);
+  total += products[i].price;
+  products[i].stock--;
+
+  updateCart();
+  loadMenu();
+}
+
+/* UPDATE CART */
 function updateCart(){
-let total=0,html="";
-cart.forEach(i=>{html+=`<p>${i.name} - ₱${i.price}</p>`;total+=i.price});
-document.getElementById("cartItems").innerHTML=html;
-document.getElementById("total").innerText=total;
+  document.getElementById("total").innerText = total;
+  document.getElementById("cartItems").innerText =
+    cart.map(c=>c.name).join(", ");
 }
 
-function showGCash(){
-document.getElementById("gcashBox").style.display=
-document.getElementById("payment").value=="gcash"?"block":"none";
-}
-
+/* CHECKOUT */
 function checkout(){
-let name=document.getElementById("name").value;
-let phone=document.getElementById("phone").value;
-let address=document.getElementById("address").value;
-let delivery=document.getElementById("delivery").value;
-let payment=document.getElementById("payment").value;
+  if(cart.length==0){
+    alert("Add items first!");
+    return;
+  }
 
-let total=cart.reduce((s,i)=>s+i.price,0);
-if(delivery=="delivery") total+=5;
+  document.getElementById("qrModal").style.display="flex";
 
-let receipt=document.getElementById("receipt");
-receipt.style.display="block";
-receipt.innerHTML=`<h2>Receipt</h2>
-<p>${name}</p>
-<p>${address}</p>
-${cart.map(i=>`<p>${i.name} - ₱${i.price}</p>`).join("")}
-<p><strong>Total: ₱${total}</strong></p>`;
-
-// rider
-let map=document.getElementById("map");
-map.style.display="block";
-let rider=document.getElementById("rider");
-let pos=0;
-let ride=setInterval(()=>{
-pos+=5;
-rider.style.left=pos+"%";
-if(pos>=90){clearInterval(ride);alert("Delivered!");}
-},500);
-
-// SMS full details
-let fullOrder = `ORDER DETAILS\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n-------------------\n` +
-cart.map(i=>`${i.name} - ₱${i.price}`).join('\n') +
-`\n-------------------\nOrder Type: ${delivery}\nTotal: ₱${total}\nPayment: ${payment}`;
-
-window.location.href=`sms:09525766589?body=${encodeURIComponent(fullOrder)}`;
+  timer = setTimeout(()=>{
+    cart = [];
+    total = 0;
+    alert("Order cancelled (not paid)");
+    location.reload();
+  }, 120000); // 2 mins
 }
 
-// bubbles
-for(let i=0;i<15;i++){let b=document.createElement("div");b.className="bubble";b.style.width=b.style.height=Math.random()*40+20+"px";b.style.left=Math.random()*100+"vw";b.style.animationDuration=(Math.random()*5+5)+"s";document.body.appendChild(b)}
+/* PAID */
+function paid(){
+  clearTimeout(timer);
 
-displayMenu();
-// INVENTORY SYSTEM
-let inventory={
-"Lumpiang Shanghai Rice":10,
-"Chicken Pastil Rice":10,
-"Siomai Rice":10
-};
+  let deliveryFee = Number(document.getElementById("delivery").value);
+  let finalTotal = total + deliveryFee;
 
-function displayMenu(){
-const menuDiv=document.getElementById("menu");
-menuDiv.innerHTML="";
-menu.forEach((item,i)=>{
-menuDiv.innerHTML += `
-<div class="menu-item">
-<span>${item.name} (Stock: ${inventory[item.name]}) - ₱${item.price}</span>
-<button ${inventory[item.name]<=0?"disabled":""} onclick="addToCart(${i})">${inventory[item.name]<=0?"Out of Stock":"Add"}</button>
-</div>`;
-});
+  alert(
+    "ORDER RECEIVED!\n\n" +
+    "Name: " + name.value + "\n" +
+    "Phone: " + phone.value + "\n" +
+    "Address: " + address.value + "\n" +
+    "Items: " + cart.map(c=>c.name).join(", ") + "\n" +
+    "Total: ₱" + finalTotal
+  );
+
+  cart = [];
+  total = 0;
+  location.reload();
 }
 
-function addToCart(i){
-let item=menu[i];
-if(inventory[item.name]>0){
-cart.push(item);
-inventory[item.name]--;
-updateCart();
-displayMenu();
-}
-}
+</script>
 
-// AUTO CANCEL IF NOT PAID
-function autoCancel(){
-setTimeout(()=>{
-if(document.getElementById("payment").value=="gcash"){
-alert("Order cancelled: No payment received.");
-cart=[];
-updateCart();
-}
-},30000); // 30 seconds
-}
-
-function checkout(){
-let name=document.getElementById("name").value;
-let phone=document.getElementById("phone").value;
-let address=document.getElementById("address").value;
-let delivery=document.getElementById("delivery").value;
-let payment=document.getElementById("payment").value;
-
-let total=cart.reduce((s,i)=>s+i.price,0);
-if(delivery=="delivery") total+=5;
-
-let receipt=document.getElementById("receipt");
-receipt.style.display="block";
-receipt.innerHTML=`<h2>Receipt</h2>
-<p>${name}</p>
-<p>${address}</p>
-${cart.map(i=>`<p>${i.name} - ₱${i.price}</p>`).join("")}
-<p><strong>Total: ₱${total}</strong></p>`;
-
-// start auto cancel timer if gcash
-if(payment=="gcash") autoCancel();
-
-// rider
-let map=document.getElementById("map");
-map.style.display="block";
-let rider=document.getElementById("rider");
-let pos=0;
-let ride=setInterval(()=>{
-pos+=5;
-rider.style.left=pos+"%";
-if(pos>=90){clearInterval(ride);alert("Delivered!");}
-},500);
-
-// SMS full details
-let fullOrder = `ORDER DETAILS
-Name: ${name}
-Phone: ${phone}
-Address: ${address}
--------------------
-` +
-cart.map(i=>`${i.name} - ₱${i.price}`).join('
-') +
-`
--------------------
-Order Type: ${delivery}
-Total: ₱${total}
-Payment: ${payment}`;
-
-window.location.href=`sms:09525766589?body=${encodeURIComponent(fullOrder)}`;
-}
-</script></body>
+</body>
 </html>
