@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3 Meal's Food Cart</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg,#74ebd5,#9face6);
+  text-align: center;
+}
+
+/* WELCOME */
+#welcome {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: #66a6ff;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 999;
+  animation: fadeOut 3s forwards;
+  animation-delay: 2s;
+}
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+
+/* LOGO */
+.logo {
+  width: 100px;
+  margin-top: 15px;
+}
+
+/* SEARCH */
+.search {
+  padding: 12px;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 25px;
+  border: none;
+  margin: 20px;
+}
+
+/* PRODUCTS */
+.products {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 20px;
+  width: 180px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* BUTTON */
+button {
+  background: #66a6ff;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 15px;
+}
+
+/* CART */
+.cart {
+  background: white;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+}
+
+/* INPUT */
+input {
+  width: 90%;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 15px;
+  border: 1px solid #ccc;
+}
+
+/* POPUP */
+#popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  transition: 0.3s;
+}
+#popup.show {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* TRACKING */
+#trackingBox {
+  display: none;
+  background: white;
+  padding: 15px;
+  border-radius: 20px;
+  width: 80%;
+  max-width: 300px;
+  margin: 20px auto;
+}
+
+/* BUBBLES */
+.bubble {
+  position: fixed;
+  bottom: -50px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  animation: floatUp linear infinite;
+}
+@keyframes floatUp {
+  to { transform: translateY(-100vh); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SOUND -->
+<audio id="notifSound">
+  <source src="https://www.soundjay.com/buttons/sounds/button-3.mp3">
+</audio>
+
+<!-- WELCOME -->
+<div id="welcome">
+  <h1>🍽️ Welcome!</h1>
+  <p>3 Meal's Food Cart</p>
+</div>
+
+<!-- LOGO -->
+<img src="logo.png" class="logo">
+
+<h2>🍔 3 Meal's Food Cart</h2>
+
+<input class="search" placeholder="Search food..." onkeyup="searchProduct()">
+
+<div class="products" id="products"></div>
+
+<div class="cart">
+  <h3>🛒 Cart</h3>
+  <ul id="cart"></ul>
+  <b>Total: ₱<span id="total">0</span></b>
+
+  <h3>📦 Customer Details</h3>
+  <input id="name" placeholder="Name">
+  <input id="address" placeholder="Address">
+  <input id="phone" placeholder="Phone">
+
+  <button onclick="order()">Place Order</button>
+
+  <h4>💳 GCash Payment</h4>
+  <img src="gcash.png" width="130">
+</div>
+
+<div id="popup">
+  <h2>🎉 Order Sent!</h2>
+  <p id="summary"></p>
+</div>
+
+<div id="trackingBox">
+  <h3>📦 Order Status</h3>
+  <p id="statusText">Waiting...</p>
+</div>
+
+<script>
+let products = [
+ {name:"Lumpiang Shanghai Rice", price:60},
+ {name:"Chicken Pastil Rice", price:70},
+ {name:"Siomai Rice", price:50}
+];
+
+let cart = [];
+
+// DISPLAY
+function display(list){
+ let html="";
+ list.forEach((p,i)=>{
+  html+=`
+  <div class="card">
+   <h4>${p.name}</h4>
+   <p>₱${p.price}</p>
+   <small style="color:green;">🚚 Free Delivery</small><br><br>
+   <button onclick="add(${i})">Add</button>
+  </div>`;
+ });
+ document.getElementById("products").innerHTML=html;
+}
+
+// ADD
+function add(i){
+ cart.push(products[i]);
+ update();
+}
+
+// UPDATE
+function update(){
+ let html="", total=0;
+ cart.forEach((c,i)=>{
+  html+=`<li>${c.name} ₱${c.price}
+  <button onclick="removeItem(${i})">❌</button></li>`;
+  total+=c.price;
+ });
+ document.getElementById("cart").innerHTML=html;
+ document.getElementById("total").innerText=total;
+}
+
+// REMOVE
+function removeItem(i){
+ cart.splice(i,1);
+ update();
+}
+
+// SEARCH
+function searchProduct(){
+ let val=document.querySelector(".search").value.toLowerCase();
+ let filtered=products.filter(p=>p.name.toLowerCase().includes(val));
+ display(filtered);
+}
+
+// ORDER
+function order(){
+ let name=document.getElementById("name").value;
+ let address=document.getElementById("address").value;
+ let phone=document.getElementById("phone").value;
+
+ if(!name||!address||!phone||cart.length===0){
+  alert("Complete order!");
+  return;
+ }
+
+ let msg=`🍽️ Order from ${name}\n📍 ${address}\n📞 ${phone}\n\n`;
+ let total=0;
+
+ cart.forEach(c=>{
+  msg+=`${c.name} ₱${c.price}\n`;
+  total+=c.price;
+ });
+
+ msg+=`\nTotal: ₱${total}`;
+
+ document.getElementById("summary").innerText=msg;
+ document.getElementById("popup").classList.add("show");
+
+ // SOUND
+ let s=document.getElementById("notifSound");
+ s.currentTime=0;
+ s.play().catch(()=>{});
+
+ // TRACKING
+ let box=document.getElementById("trackingBox");
+ let status=document.getElementById("statusText");
+
+ box.style.display="block";
+ status.innerText="👨‍🍳 Preparing...";
+ setTimeout(()=>{status.innerText="🛵 On the way...";},4000);
+ setTimeout(()=>{status.innerText="✅ Delivered!";},8000);
+
+ // SMS
+ window.location.href=`sms:09359335066?body=${encodeURIComponent(msg)}`;
+
+ cart=[];
+ update();
+}
+
+// BUBBLES
+for(let i=0;i<25;i++){
+ let b=document.createElement("div");
+ b.className="bubble";
+ b.style.left=Math.random()*100+"vw";
+ b.style.width=b.style.height=(20+Math.random()*30)+"px";
+ b.style.animationDuration=(5+Math.random()*10)+"s";
+ document.body.appendChild(b);
+}
+
+// INIT
+display(products);
+</script>
+
+</body>
+</html>
