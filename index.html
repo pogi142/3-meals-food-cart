@@ -2,207 +2,161 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>3 Meals Food Cart</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3 Meal's Food Cart</title>
 
 <style>
 body {
-  font-family: 'Poppins', sans-serif;
   margin: 0;
-  background: linear-gradient(135deg, #ff7eb3, #65d6ce);
-  color: white;
-  text-align: center;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  overflow-x: hidden;
 }
 
-/* WELCOME */
-.header {
-  padding: 30px;
-  animation: fadeDown 1s ease;
-}
-
-@keyframes fadeDown {
-  from {opacity: 0; transform: translateY(-20px);}
-  to {opacity: 1; transform: translateY(0);}
-}
-
-h1 {
-  font-size: 42px;
-  margin: 0;
-}
-
-.quote {
-  font-size: 18px;
-  opacity: 0.9;
-}
-
-/* CARD */
-.card {
-  background: white;
-  color: black;
-  margin: 15px auto;
-  padding: 20px;
-  border-radius: 25px;
-  max-width: 420px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-  animation: pop 0.5s ease;
-}
-
-@keyframes pop {
-  from {transform: scale(0.9); opacity: 0;}
-  to {transform: scale(1); opacity: 1;}
-}
-
-/* MENU */
-.item {
-  margin-bottom: 15px;
-}
-
-.qty {
+/* WELCOME SCREEN */
+#welcome {
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(135deg, #ff6a00, #ee0979);
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.qty button {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  background: #ff5e62;
   color: white;
-  font-size: 18px;
+  font-size: 40px;
+  font-weight: bold;
+  animation: fadeOut 1s ease 3s forwards;
 }
 
-.qty span {
-  margin: 0 10px;
-  font-size: 20px;
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
 }
 
-/* BUTTON */
-button.main {
-  padding: 12px 18px;
-  border: none;
-  border-radius: 20px;
-  background: #ff5e62;
+/* MAIN */
+#main {
+  display: none;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
   color: white;
-  font-size: 16px;
-  margin-top: 10px;
+  text-shadow: 2px 2px 5px black;
 }
 
-button.main:hover {
-  transform: scale(1.1);
+/* MENU */
+.menu {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
 }
 
-/* INPUT */
-input {
-  width: 90%;
-  padding: 12px;
-  margin: 5px;
+.item {
+  background: white;
+  padding: 10px;
+  border-radius: 15px;
+}
+
+button {
+  padding: 8px;
+  border: none;
+  background: #ff4081;
+  color: white;
   border-radius: 10px;
-  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+/* CART */
+#cart {
+  margin-top: 20px;
+  background: white;
+  padding: 10px;
+  border-radius: 15px;
+}
+
+.qr {
+  margin-top: 10px;
+  width: 150px;
 }
 </style>
+
 </head>
 
 <body>
 
 <!-- WELCOME -->
-<div class="header">
-  <h1>🍱 Welcome to 3 Meal's Food Cart</h1>
-  <p class="quote">"Good food. Fast service. Happy customers."</p>
-</div>
+<div id="welcome">Welcome to 3 Meal's</div>
 
-<!-- QR -->
-<div class="card">
-  <h2>Scan to Order</h2>
-  <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=YOUR_WEBSITE_LINK">
-</div>
+<!-- MAIN -->
+<div id="main">
 
-<!-- MENU -->
-<div class="card">
-  <h2>Menu</h2>
+<h1>Menu</h1>
 
+<div class="menu">
   <div class="item">
-    <p>Lumpiang Shanghai Rice - ₱60</p>
-    <div class="qty">
-      <button onclick="change('lumpia',-1)">-</button>
-      <span id="lumpia">0</span>
-      <button onclick="change('lumpia',1)">+</button>
-    </div>
+    <h3>Burger</h3>
+    <p>₱50</p>
+    <button onclick="addToCart('Burger',50)">Add</button>
   </div>
 
   <div class="item">
-    <p>Chicken Pastil Rice - ₱70</p>
-    <div class="qty">
-      <button onclick="change('pastil',-1)">-</button>
-      <span id="pastil">0</span>
-      <button onclick="change('pastil',1)">+</button>
-    </div>
+    <h3>Fries</h3>
+    <p>₱30</p>
+    <button onclick="addToCart('Fries',30)">Add</button>
   </div>
 
   <div class="item">
-    <p>Siomai Rice - ₱50</p>
-    <div class="qty">
-      <button onclick="change('siomai',-1)">-</button>
-      <span id="siomai">0</span>
-      <button onclick="change('siomai',1)">+</button>
-    </div>
+    <h3>Hotdog</h3>
+    <p>₱40</p>
+    <button onclick="addToCart('Hotdog',40)">Add</button>
+  </div>
+
+  <div class="item">
+    <h3>Drinks</h3>
+    <p>₱20</p>
+    <button onclick="addToCart('Drinks',20)">Add</button>
   </div>
 </div>
 
-<!-- CHECKOUT -->
-<div class="card">
-  <h2>Checkout</h2>
+<!-- CART -->
+<div id="cart">
+  <h2>Cart</h2>
+  <ul id="cartList"></ul>
+  <h3>Total: ₱<span id="total">0</span></h3>
+  <h3>Delivery Fee: ₱10</h3>
+  <h2>Final: ₱<span id="final">10</span></h2>
 
-  <input id="name" placeholder="Your Name">
-  <input id="address" placeholder="Address">
-  <input id="number" placeholder="Phone Number">
+  <button onclick="checkout()">Checkout</button>
 
-  <button class="main" onclick="order()">Place Order</button>
+  <div id="payment" style="display:none;">
+    <h3>Scan to Pay (GCash)</h3>
+    <img src="gcash.png" class="qr">
+  </div>
+</div>
+
 </div>
 
 <script>
-let prices = { lumpia:60, pastil:70, siomai:50 };
-let qty = { lumpia:0, pastil:0, siomai:0 };
+let total = 0;
 
-function change(item, val){
-  qty[item] += val;
-  if(qty[item] < 0) qty[item] = 0;
-  document.getElementById(item).innerText = qty[item];
+function addToCart(name, price) {
+  let li = document.createElement("li");
+  li.textContent = name + " - ₱" + price;
+  document.getElementById("cartList").appendChild(li);
+
+  total += price;
+  document.getElementById("total").textContent = total;
+  document.getElementById("final").textContent = total + 10;
 }
 
-function order(){
-  let name = document.getElementById("name").value;
-  let address = document.getElementById("address").value;
-  let number = document.getElementById("number").value;
-
-  let total = 0;
-  let items = [];
-
-  for(let i in qty){
-    if(qty[i] > 0){
-      items.push(i + " x" + qty[i]);
-      total += qty[i] * prices[i];
-    }
-  }
-
-  if(items.length === 0){
-    alert("No order!");
-    return;
-  }
-
-  let msg =
-  "ORDER\n" +
-  "Name: " + name + "\n" +
-  "Address: " + address + "\n" +
-  "Phone: " + number + "\n" +
-  "Items: " + items.join(", ") + "\n" +
-  "Total: ₱" + total;
-
-  let sms = "sms:09525766589?body=" + encodeURIComponent(msg);
-  window.open(sms);
-
-  alert("Order ready to send!");
+function checkout() {
+  document.getElementById("payment").style.display = "block";
 }
+
+/* AUTO SHOW MENU AFTER 3 SEC */
+setTimeout(() => {
+  document.getElementById("main").style.display = "block";
+}, 3000);
 </script>
 
 </body>
