@@ -2,234 +2,101 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3 Meal's Food Cart</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<title>Food Cart Order</title>
 
 <style>
 body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg,#5f9cff,#6dd5ed);
-  color: #333;
+  font-family: Arial;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
   text-align: center;
+  color: #333;
 }
 
-/* HEADER */
-.logo {
-  width: 90px;
-  margin-top: 20px;
-}
-
-h2 {
-  margin: 10px 0;
-}
-
-/* SEARCH */
-.search {
-  padding: 14px;
-  width: 85%;
-  border-radius: 30px;
-  border: none;
-  margin: 15px;
-  font-size: 16px;
-}
-
-/* PRODUCT GRID */
-.products {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 15px;
-}
-
-/* GLASS CARD */
-.card {
-  backdrop-filter: blur(10px);
-  background: rgba(255,255,255,0.2);
-  border-radius: 20px;
+.container {
+  margin: 20px;
   padding: 20px;
-  width: 180px;
-  color: white;
+  background: white;
+  border-radius: 20px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
-/* BUTTON */
 button {
-  background: linear-gradient(135deg,#ff7e5f,#feb47b);
+  padding: 12px 20px;
   border: none;
-  padding: 10px;
-  border-radius: 20px;
+  border-radius: 10px;
+  background: #ff5e62;
   color: white;
-  font-weight: bold;
+  font-size: 16px;
   cursor: pointer;
 }
 
-/* CART */
-.cart {
-  background: white;
-  margin: 20px;
-  padding: 20px;
-  border-radius: 20px;
+button:hover {
+  background: #ff2e35;
 }
 
-/* INPUT */
-input {
-  width: 90%;
-  padding: 10px;
-  margin: 5px;
-  border-radius: 15px;
-  border: 1px solid #ccc;
-}
-
-/* POPUP */
-#popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0);
-  background: white;
-  padding: 20px;
-  border-radius: 20px;
-  transition: 0.3s;
-}
-#popup.show {
-  transform: translate(-50%, -50%) scale(1);
-}
-
-/* TRACKING */
-#trackingBox {
+.hidden {
   display: none;
-  background: white;
-  padding: 15px;
-  margin: 20px;
-  border-radius: 20px;
+}
+
+img {
+  border-radius: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- SOUND -->
-<audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+<h1>🍔 3 Meals Food Cart</h1>
 
-<img src="logo.png" class="logo">
-<h2>🍔 3 Meal's Food Cart</h2>
+<div class="container">
+  <h2>Step 1: Pay First</h2>
+  <p>Scan the QR below and send payment</p>
 
-<input class="search" placeholder="Search..." onkeyup="searchProduct()">
+  <img src="gcash.png" width="200"><br><br>
 
-<div class="products" id="products"></div>
+  <input type="file" id="proof">
+  <p>Upload your payment screenshot</p>
 
-<div class="cart">
-  <h3>🛒 Cart</h3>
-  <ul id="cart"></ul>
-  <b>Total: ₱<span id="total">0</span></b>
-
-  <h3>📦 Details</h3>
-  <input id="name" placeholder="Name">
-  <input id="address" placeholder="Address">
-  <input id="phone" placeholder="Phone">
-
-  <button onclick="order()">Order Now</button>
-
-  <h4>💳 GCash</h4>
-  <img src="gcash.png" width="130">
+  <button onclick="verifyPayment()">I Paid</button>
 </div>
 
-<div id="popup">
-  <h2>🎉 Order Sent!</h2>
-  <p id="summary"></p>
-</div>
+<div class="container hidden" id="orderSection">
+  <h2>Step 2: Place Order</h2>
 
-<div id="trackingBox">
-  <p id="statusText"></p>
+  <input type="text" id="name" placeholder="Your Name"><br><br>
+  <input type="text" id="order" placeholder="Your Order"><br><br>
+
+  <button onclick="submitOrder()">Submit Order</button>
 </div>
 
 <script>
-let products = [
- {name:"Lumpiang Shanghai Rice", price:60},
- {name:"Chicken Pastil Rice", price:70},
- {name:"Siomai Rice", price:50}
-];
+function verifyPayment() {
+  let file = document.getElementById("proof").files[0];
 
-let cart=[];
+  if (!file) {
+    alert("Please upload payment proof first!");
+    return;
+  }
 
-function display(list){
- let html="";
- list.forEach((p,i)=>{
-  html+=`
-  <div class="card">
-   <h4>${p.name}</h4>
-   <p>₱${p.price}</p>
-   <button onclick="add(${i})">Add</button>
-  </div>`;
- });
- document.getElementById("products").innerHTML=html;
+  alert("Payment received! You can now order.");
+  document.getElementById("orderSection").classList.remove("hidden");
 }
 
-function add(i){
- document.getElementById("clickSound").play();
- cart.push(products[i]);
- update();
+function submitOrder() {
+  let name = document.getElementById("name").value;
+  let order = document.getElementById("order").value;
+
+  if (name === "" || order === "") {
+    alert("Please fill in all fields!");
+    return;
+  }
+
+  alert("Order sent! Please wait for confirmation.");
+
+  // OPTIONAL: Play sound
+  let audio = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
+  audio.play();
 }
-
-function update(){
- let html="", total=0;
- cart.forEach((c,i)=>{
-  html+=`<li>${c.name} ₱${c.price}</li>`;
-  total+=c.price;
- });
- document.getElementById("cart").innerHTML=html;
- document.getElementById("total").innerText=total;
-}
-
-function searchProduct(){
- let val=document.querySelector(".search").value.toLowerCase();
- let filtered=products.filter(p=>p.name.toLowerCase().includes(val));
- display(filtered);
-}
-
-function order(){
- document.getElementById("clickSound").play();
-
- let name=document.getElementById("name").value;
- let address=document.getElementById("address").value;
- let phone=document.getElementById("phone").value;
-
- if(!name||!address||!phone||cart.length===0){
-  alert("Complete order!");
-  return;
- }
-
- let msg=`Order from ${name}\n${address}\n${phone}\n\n`;
- let total=0;
-
- cart.forEach(c=>{
-  msg+=`${c.name} ₱${c.price}\n`;
-  total+=c.price;
- });
-
- msg+=`\nTotal: ₱${total}`;
-
- document.getElementById("summary").innerText=msg;
- document.getElementById("popup").classList.add("show");
-
- let status=document.getElementById("statusText");
- let box=document.getElementById("trackingBox");
-
- box.style.display="block";
- status.innerText="Preparing...";
- setTimeout(()=>{status.innerText="On the way...";},3000);
- setTimeout(()=>{status.innerText="Delivered!";},6000);
-
- window.location.href=`sms:09359335066?body=${encodeURIComponent(msg)}`;
-
- cart=[];
- update();
-}
-
-display(products);
 </script>
 
 </body>
