@@ -6,7 +6,6 @@
 <title>Bahay Toro Food Delivery</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
 body {
@@ -27,13 +26,18 @@ body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  z-index: 999;
   animation: fadeOut 3s forwards;
   animation-delay: 2s;
-  z-index: 999;
 }
-
 @keyframes fadeOut {
   to { opacity: 0; visibility: hidden; }
+}
+
+/* LOGO */
+.logo {
+  width: 100px;
+  margin-top: 10px;
 }
 
 /* SEARCH */
@@ -49,25 +53,26 @@ body {
 /* PRODUCTS */
 .products {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   gap: 15px;
+  flex-wrap: wrap;
 }
-
 .card {
   background: white;
   padding: 15px;
   border-radius: 20px;
-  width: 170px;
+  width: 180px;
   box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
+/* BUTTON */
 button {
   background: #66a6ff;
-  color: white;
   border: none;
-  padding: 8px;
+  padding: 8px 12px;
+  color: white;
   border-radius: 15px;
+  cursor: pointer;
 }
 
 /* CART */
@@ -80,7 +85,7 @@ button {
   max-width: 400px;
 }
 
-/* ORDER FORM */
+/* INPUT */
 input {
   width: 90%;
   padding: 10px;
@@ -98,12 +103,22 @@ input {
   background: white;
   padding: 25px;
   border-radius: 20px;
-  z-index: 1000;
   transition: 0.3s;
+  z-index: 1000;
 }
-
 #popup.show {
   transform: translate(-50%, -50%) scale(1);
+}
+
+/* TRACKING */
+#trackingBox {
+  background: white;
+  padding: 15px;
+  border-radius: 20px;
+  width: 80%;
+  max-width: 300px;
+  margin: 20px auto;
+  display: none;
 }
 
 /* BUBBLES */
@@ -114,7 +129,6 @@ input {
   border-radius: 50%;
   animation: floatUp linear infinite;
 }
-
 @keyframes floatUp {
   to { transform: translateY(-100vh); }
 }
@@ -123,54 +137,65 @@ input {
 
 <body>
 
+<!-- SOUND -->
+<audio id="notifSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+
 <!-- WELCOME -->
 <div id="welcome">
   <h1>🍽️ Welcome!</h1>
   <p>Bahay Toro Food Delivery</p>
 </div>
 
-<h2>🍔 Order Now</h2>
+<!-- LOGO -->
+<img src="logo.png" class="logo">
+
+<h2>Order Now</h2>
 
 <input class="search" placeholder="Search food..." onkeyup="searchProduct()">
 
+<!-- PRODUCTS -->
 <div class="products" id="products"></div>
 
+<!-- CART -->
 <div class="cart">
   <h3>🛒 Cart</h3>
   <ul id="cart"></ul>
   <b>Total: ₱<span id="total">0</span></b>
 
-  <h3>📦 Your Details</h3>
+  <h3>📦 Customer Details</h3>
   <input id="name" placeholder="Name">
   <input id="address" placeholder="Address">
   <input id="phone" placeholder="Phone">
 
   <button onclick="order()">Place Order</button>
 
-  <h4>💳 GCash</h4>
-  <img src="qr.png" width="120">
+  <h4>💳 GCash Payment</h4>
+  <img src="qr.png" width="130">
 </div>
 
+<!-- POPUP -->
 <div id="popup">
-  <h2>🎉 Order Received!</h2>
+  <h2>🎉 Order Sent!</h2>
   <p id="summary"></p>
 </div>
 
-<div id="qrcode"></div>
+<!-- TRACKING -->
+<div id="trackingBox">
+  <h3>📦 Order Status</h3>
+  <p id="statusText">Waiting...</p>
+</div>
 
 <script>
+// PRODUCTS
 let products = [
   {name:"Lumpiang Shanghai Rice", price:60},
   {name:"Chicken Pastil Rice", price:70},
   {name:"Siomai Rice", price:50}
 ];
 
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let cart = [];
 
-function saveCart() {
-  localStorage.setItem("cart", JSON.stringify(cart));
-}
-
+// DISPLAY
 function display(list){
   let html="";
   list.forEach((p,i)=>{
@@ -178,44 +203,48 @@ function display(list){
     <div class="card">
       <h4>${p.name}</h4>
       <p>₱${p.price}</p>
-      <small style="color:green;">Free Delivery - Bahay Toro</small><br>
-      <button onclick="add(${i})">Add</button>
+      <small style="color:green;">🚚 Free Delivery - Bahay Toro</small><br><br>
+      <button onclick="add(${i})">Add to Cart</button>
     </div>`;
   });
   document.getElementById("products").innerHTML=html;
 }
 
+// ADD
 function add(i){
   cart.push(products[i]);
   update();
-  saveCart();
 }
 
+// UPDATE
 function update(){
   let html="";
   let total=0;
+
   cart.forEach((c,index)=>{
-    html+=`
-    <li>${c.name} ₱${c.price}
+    html+=`<li>${c.name} ₱${c.price}
     <button onclick="removeItem(${index})">❌</button></li>`;
     total+=c.price;
   });
+
   document.getElementById("cart").innerHTML=html;
   document.getElementById("total").innerText=total;
 }
 
+// REMOVE
 function removeItem(i){
   cart.splice(i,1);
   update();
-  saveCart();
 }
 
+// SEARCH
 function searchProduct(){
   let val=document.querySelector(".search").value.toLowerCase();
   let filtered=products.filter(p=>p.name.toLowerCase().includes(val));
   display(filtered);
 }
 
+// ORDER
 function order(){
   let name=document.getElementById("name").value;
   let address=document.getElementById("address").value;
@@ -226,36 +255,42 @@ function order(){
     return;
   }
 
-  let text=`Order from ${name}\n${address}\n${phone}\n\n`;
+  let message=`🍽️ Order from ${name}\n📍 ${address}\n📞 ${phone}\n\n`;
   let total=0;
 
   cart.forEach(c=>{
-    text+=`${c.name} ₱${c.price}\n`;
+    message+=`${c.name} ₱${c.price}\n`;
     total+=c.price;
   });
 
-  text+=`\nTotal: ₱${total}`;
+  message+=`\nTotal: ₱${total}`;
 
-  document.getElementById("summary").innerText=text;
+  // SHOW POPUP
+  document.getElementById("summary").innerText=message;
   document.getElementById("popup").classList.add("show");
 
-  // OPEN SMS (CHANGE NUMBER)
-  window.location.href = `sms:09359335066?body=${encodeURIComponent(text)}`;
+  // 🔔 SOUND
+  document.getElementById("notifSound").play();
+
+  // 📦 TRACKING
+  let box = document.getElementById("trackingBox");
+  let status = document.getElementById("statusText");
+
+  box.style.display = "block";
+  status.innerText = "👨‍🍳 Preparing your order...";
+
+  setTimeout(()=>{ status.innerText="🛵 On the way..."; }, 5000);
+  setTimeout(()=>{ status.innerText="✅ Delivered! Enjoy 🍽️"; }, 10000);
+
+  // SEND SMS (CHANGE NUMBER)
+  window.location.href = `sms:09359335066?body=${encodeURIComponent(message)}`;
 
   cart=[];
-  saveCart();
   update();
 }
 
-// QR WEBSITE
-new QRCode(document.getElementById("qrcode"), {
-  text: "https://your-site-link.com",
-  width: 120,
-  height: 120
-});
-
 // BUBBLES
-for(let i=0;i<20;i++){
+for(let i=0;i<25;i++){
   let b=document.createElement("div");
   b.className="bubble";
   b.style.left=Math.random()*100+"vw";
@@ -264,8 +299,8 @@ for(let i=0;i<20;i++){
   document.body.appendChild(b);
 }
 
+// INIT
 display(products);
-update();
 </script>
 
 </body>
