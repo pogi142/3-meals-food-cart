@@ -1,210 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <title>3 Meal's Food Cart</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
     font-family: Arial;
-    margin: 0;
-    background: #fff5e6;
-}
-
-/* HEADER */
-header {
-    background: #d62828;
+    background: black;
     color: white;
     padding: 15px;
+}
+
+h1 {
     text-align: center;
+    color: yellow;
+    animation: fade 2s;
 }
 
-/* SEARCH BAR */
-.search {
-    padding: 10px;
-    text-align: center;
-}
-
-.search input {
-    width: 80%;
-    padding: 10px;
-    border-radius: 20px;
-    border: 1px solid #ccc;
-}
-
-/* MENU */
-.menu {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.item {
-    background: white;
-    margin: 10px;
-    padding: 15px;
+.box {
+    background: #111;
+    border: 2px solid red;
     border-radius: 10px;
-    width: 150px;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    transition: transform 0.3s;
+    padding: 15px;
+    margin: 10px 0;
 }
 
-.item:hover {
-    transform: scale(1.05);
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: none;
 }
 
 button {
-    background: #f77f00;
+    background: red;
+    color: white;
+    padding: 12px;
+    width: 100%;
     border: none;
-    padding: 8px;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
 }
 
-/* CART */
-.cart {
-    background: #003049;
-    color: white;
-    padding: 15px;
+.total {
+    color: yellow;
+    font-size: 18px;
 }
 
-input, select {
-    padding: 8px;
-    margin: 5px;
+.gcash {
+    text-align: center;
 }
 
-/* RECEIPT */
-#receipt {
-    background: white;
-    padding: 10px;
-    margin-top: 10px;
-    display: none;
-}
-
-/* ANIMATION */
-.fade {
-    animation: fadeIn 1s;
-}
-
-@keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
+@keyframes fade {
+    from {opacity:0;}
+    to {opacity:1;}
 }
 </style>
 </head>
 
 <body>
 
-<header>
-<h1>🍔 3 Meal's Food Cart</h1>
-</header>
+<h1>🍽️ 3 Meal's Food Cart</h1>
 
-<!-- SEARCH -->
-<div class="search">
-<input type="text" id="search" placeholder="Search food..." onkeyup="searchFood()">
+<div class="box">
+<h2>🍱 Menu</h2>
+
+<input type="checkbox" value="60" data-name="Lumpiang Shanghai Rice"> Lumpiang Shanghai Rice - ₱60<br>
+<input type="checkbox" value="80" data-name="Chicken Pastil Rice"> Chicken Pastil Rice - ₱80<br>
+<input type="checkbox" value="70" data-name="Siomai Rice"> Siomai Rice - ₱70<br>
+
 </div>
 
-<!-- MENU -->
-<div class="menu" id="menu">
-<div class="item fade">
-<h3>Burger</h3>
-<p>₱50</p>
-<button onclick="addToCart('Burger',50)">Add</button>
+<div class="box">
+<h2>👤 Customer Info</h2>
+
+Name:
+<input type="text" id="name">
+
+Address (Bahay Toro / Toro Hills):
+<input type="text" id="address">
+
 </div>
 
-<div class="item fade">
-<h3>Fries</h3>
-<p>₱30</p>
-<button onclick="addToCart('Fries',30)">Add</button>
+<div class="box">
+<h2>💳 GCash Payment</h2>
+
+<div class="gcash">
+<img src="https://upload.wikimedia.org/wikipedia/commons/1/1c/GCash_logo.png" width="120"><br><br>
+
+<b>GCash Number:</b><br>
+<span style="color:yellow; font-size:18px;">09359335066</span><br><br>
+
+<p>✔ Send payment before placing order</p>
+
+<button onclick="copyNumber()">Copy GCash Number</button>
 </div>
 
-<div class="item fade">
-<h3>Hotdog</h3>
-<p>₱40</p>
-<button onclick="addToCart('Hotdog',40)">Add</button>
-</div>
 </div>
 
-<!-- CART / CHECKOUT -->
-<div class="cart">
-<h2>🛒 Cart</h2>
+<div class="box">
+<h2>📋 Order Summary</h2>
 
-Name: <input type="text" id="name"><br>
+<div id="summary"></div>
+<div class="total" id="total">Total: ₱0</div>
 
-<ul id="cartList"></ul>
-
-Total: ₱<span id="total">0</span><br><br>
-
-<button onclick="checkout()">Checkout</button>
-
-<!-- RECEIPT -->
-<div id="receipt"></div>
-
-<!-- QR PAYMENT -->
-<h3>📱 Pay with GCash</h3>
-<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=09525766589">
-
-<h3>🌐 Visit Website</h3>
-<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://pogi142.github.io/3-meals-food-cart/">
 </div>
+
+<button onclick="placeOrder()">🚀 Place Order</button>
 
 <script>
-let cart = [];
-let total = 0;
-
-function addToCart(name, price) {
-    cart.push({name, price});
-    total += price;
-    updateCart();
+function copyNumber() {
+    navigator.clipboard.writeText("09359335066");
+    alert("GCash number copied!");
 }
 
-function updateCart() {
-    let list = document.getElementById("cartList");
-    list.innerHTML = "";
+function placeOrder() {
+    let name = document.getElementById("name").value;
+    let address = document.getElementById("address").value;
+    let items = document.querySelectorAll("input[type=checkbox]:checked");
 
-    cart.forEach(item => {
-        let li = document.createElement("li");
-        li.textContent = item.name + " - ₱" + item.price;
-        list.appendChild(li);
+    let total = 0;
+    let orderList = "";
+
+    items.forEach(item => {
+        total += parseInt(item.value);
+        orderList += item.getAttribute("data-name") + ", ";
     });
 
-    document.getElementById("total").textContent = total;
-}
-
-function checkout() {
-    let name = document.getElementById("name").value;
-
-    if(name === "") {
-        alert("Enter your name!");
+    if (!name || !address || items.length === 0) {
+        alert("Please complete your order!");
         return;
     }
 
-    let receipt = document.getElementById("receipt");
-    receipt.style.display = "block";
+    let message = 
+`Order from 3 Meal's Food Cart
+Name: ${name}
+Address: ${address}
+Order: ${orderList}
+Total: ₱${total}
+Free Delivery (Bahay Toro / Toro Hills)`;
 
-    let items = cart.map(i => i.name).join(", ");
-
-    receipt.innerHTML = `
-        <h3>🧾 Receipt</h3>
-        Name: ${name}<br>
-        Items: ${items}<br>
-        Total: ₱${total}<br>
-        Contact: 09525766589
-    `;
-}
-
-/* SEARCH FUNCTION */
-function searchFood() {
-    let input = document.getElementById("search").value.toLowerCase();
-    let items = document.querySelectorAll(".item");
-
-    items.forEach(item => {
-        let text = item.innerText.toLowerCase();
-        item.style.display = text.includes(input) ? "" : "none";
-    });
+    alert("Order Sent! Copy this and send via Messenger:\n\n" + message);
 }
 </script>
 
