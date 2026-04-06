@@ -6,209 +6,202 @@
 
 <style>
 body {
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
-}
-
-/* HEADER */
-.header {
-  background: #111;
+  background: linear-gradient(135deg, #ff7eb3, #65d6ce);
   color: white;
-  padding: 20px;
   text-align: center;
 }
 
-.header h1 {
+/* WELCOME */
+.header {
+  padding: 30px;
+  animation: fadeDown 1s ease;
+}
+
+@keyframes fadeDown {
+  from {opacity: 0; transform: translateY(-20px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+h1 {
+  font-size: 42px;
   margin: 0;
-  font-size: 26px;
 }
 
-.header p {
-  margin: 5px 0 0;
-  font-size: 14px;
-  color: #ccc;
+.quote {
+  font-size: 18px;
+  opacity: 0.9;
 }
-
-/* PAGE */
-.page { display: none; padding: 20px; }
-.active { display: block; }
 
 /* CARD */
 .card {
   background: white;
+  color: black;
+  margin: 15px auto;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 25px;
   max-width: 420px;
-  margin: auto;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  animation: pop 0.5s ease;
+}
+
+@keyframes pop {
+  from {transform: scale(0.9); opacity: 0;}
+  to {transform: scale(1); opacity: 1;}
+}
+
+/* MENU */
+.item {
+  margin-bottom: 15px;
+}
+
+.qty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.qty button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #ff5e62;
+  color: white;
+  font-size: 18px;
+}
+
+.qty span {
+  margin: 0 10px;
+  font-size: 20px;
 }
 
 /* BUTTON */
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
+button.main {
+  padding: 12px 18px;
   border: none;
-  background: #222;
+  border-radius: 20px;
+  background: #ff5e62;
   color: white;
   font-size: 16px;
-  border-radius: 8px;
+  margin-top: 10px;
 }
 
-button:hover { background: #000; }
+button.main:hover {
+  transform: scale(1.1);
+}
 
-input, select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  border-radius: 8px;
+/* INPUT */
+input {
+  width: 90%;
+  padding: 12px;
+  margin: 5px;
+  border-radius: 10px;
   border: 1px solid #ccc;
 }
-
-.hidden { display: none; }
 </style>
 </head>
 
 <body>
 
-<!-- WELCOME HEADER -->
+<!-- WELCOME -->
 <div class="header">
   <h1>🍱 Welcome to 3 Meal's Food Cart</h1>
-  <p>"Good food, fast service, happy customers."</p>
+  <p class="quote">"Good food. Fast service. Happy customers."</p>
 </div>
 
-<!-- PAGE 1 -->
-<div class="page active" id="p1">
-  <div class="card">
-    <h3>Menu</h3>
+<!-- QR -->
+<div class="card">
+  <h2>Scan to Order</h2>
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=YOUR_WEBSITE_LINK">
+</div>
 
+<!-- MENU -->
+<div class="card">
+  <h2>Menu</h2>
+
+  <div class="item">
     <p>Lumpiang Shanghai Rice - ₱60</p>
-    <button onclick="add('Lumpia',60)">Add</button>
+    <div class="qty">
+      <button onclick="change('lumpia',-1)">-</button>
+      <span id="lumpia">0</span>
+      <button onclick="change('lumpia',1)">+</button>
+    </div>
+  </div>
 
+  <div class="item">
     <p>Chicken Pastil Rice - ₱70</p>
-    <button onclick="add('Pastil',70)">Add</button>
+    <div class="qty">
+      <button onclick="change('pastil',-1)">-</button>
+      <span id="pastil">0</span>
+      <button onclick="change('pastil',1)">+</button>
+    </div>
+  </div>
 
+  <div class="item">
     <p>Siomai Rice - ₱50</p>
-    <button onclick="add('Siomai',50)">Add</button>
-
-    <p>Cart: <span id="cart">Empty</span></p>
-    <p>Total: ₱<span id="total">0</span></p>
-
-    <button onclick="go(2)">Next</button>
+    <div class="qty">
+      <button onclick="change('siomai',-1)">-</button>
+      <span id="siomai">0</span>
+      <button onclick="change('siomai',1)">+</button>
+    </div>
   </div>
 </div>
 
-<!-- PAGE 2 -->
-<div class="page" id="p2">
-  <div class="card">
-    <h3>Customer Info</h3>
+<!-- CHECKOUT -->
+<div class="card">
+  <h2>Checkout</h2>
 
-    <input id="name" placeholder="Full Name">
-    <input id="number" placeholder="Phone Number">
+  <input id="name" placeholder="Your Name">
+  <input id="address" placeholder="Address">
+  <input id="number" placeholder="Phone Number">
 
-    <select id="method" onchange="toggleDelivery()">
-      <option value="">Select Option</option>
-      <option value="pickup">Pick Up</option>
-      <option value="delivery">Delivery</option>
-    </select>
-
-    <div id="deliveryArea" class="hidden">
-      <select id="area">
-        <option>Road 14 - Bahay Toro</option>
-        <option>Road 15 - Bahay Toro</option>
-        <option>Road 16 - Bahay Toro</option>
-        <option>Road 17 - Bahay Toro</option>
-        <option>Road 18 - Bahay Toro</option>
-        <option>Road 19 - Bahay Toro</option>
-        <option>Road 20 - Bahay Toro</option>
-      </select>
-
-      <input id="address" placeholder="Full Address">
-    </div>
-
-    <button onclick="go(3)">Next</button>
-  </div>
-</div>
-
-<!-- PAGE 3 -->
-<div class="page" id="p3">
-  <div class="card">
-    <h3>Payment</h3>
-
-    <button onclick="order('Cash')">Cash</button>
-    <button onclick="order('GCash')">GCash</button>
-
-    <div id="gcashBox" class="hidden">
-      <p>Scan to Pay</p>
-      <img src="gcash.png" width="200"><br><br>
-      <input type="file" id="proof">
-      <button onclick="confirmGCash()">Confirm Payment</button>
-    </div>
-  </div>
+  <button class="main" onclick="order()">Place Order</button>
 </div>
 
 <script>
-let cart = [];
-let total = 0;
+let prices = { lumpia:60, pastil:70, siomai:50 };
+let qty = { lumpia:0, pastil:0, siomai:0 };
 
-function add(item, price){
-  cart.push(item);
-  total += price;
-  document.getElementById("cart").innerText = cart.join(", ");
-  document.getElementById("total").innerText = total;
+function change(item, val){
+  qty[item] += val;
+  if(qty[item] < 0) qty[item] = 0;
+  document.getElementById(item).innerText = qty[item];
 }
 
-function go(page){
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById("p"+page).classList.add("active");
-}
+function order(){
+  let name = document.getElementById("name").value;
+  let address = document.getElementById("address").value;
+  let number = document.getElementById("number").value;
 
-function toggleDelivery(){
-  let method = document.getElementById("method").value;
-  document.getElementById("deliveryArea").classList.toggle("hidden", method !== "delivery");
-}
+  let total = 0;
+  let items = [];
 
-function order(type){
-  if(type === "GCash"){
-    document.getElementById("gcashBox").classList.remove("hidden");
-  } else {
-    sendOrder("Cash");
+  for(let i in qty){
+    if(qty[i] > 0){
+      items.push(i + " x" + qty[i]);
+      total += qty[i] * prices[i];
+    }
   }
-}
 
-function confirmGCash(){
-  let file = document.getElementById("proof").files[0];
-  if(!file){
-    alert("Upload proof!");
+  if(items.length === 0){
+    alert("No order!");
     return;
   }
-  sendOrder("GCash Paid");
-}
-
-function sendOrder(payment){
-  let name = document.getElementById("name").value;
-  let number = document.getElementById("number").value;
-  let method = document.getElementById("method").value;
-  let area = document.getElementById("area")?.value || "";
-  let address = document.getElementById("address")?.value || "";
 
   let msg =
   "ORDER\n" +
   "Name: " + name + "\n" +
-  "Phone: " + number + "\n" +
-  "Type: " + method + "\n" +
-  "Area: " + area + "\n" +
   "Address: " + address + "\n" +
-  "Items: " + cart.join(", ") + "\n" +
-  "Total: ₱" + total + "\n" +
-  "Payment: " + payment;
+  "Phone: " + number + "\n" +
+  "Items: " + items.join(", ") + "\n" +
+  "Total: ₱" + total;
 
-  // Messenger
-  let messenger = "https://m.me/SaifHossamLapitan?text=" + encodeURIComponent(msg);
-  window.open(messenger, "_blank");
+  let sms = "sms:09525766589?body=" + encodeURIComponent(msg);
+  window.open(sms);
 
-  alert("Order sent!");
+  alert("Order ready to send!");
 }
 </script>
 
