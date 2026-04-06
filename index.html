@@ -1,150 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>3 Meal's Food Cart</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body {
-    font-family: Arial;
-    background: black;
-    color: white;
-    padding: 15px;
-}
-
-h1 {
-    text-align: center;
-    color: yellow;
-    animation: fade 2s;
-}
-
-.box {
-    background: #111;
-    border: 2px solid red;
-    border-radius: 10px;
-    padding: 15px;
-    margin: 10px 0;
-}
-
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-    border: none;
-}
-
-button {
-    background: red;
-    color: white;
-    padding: 12px;
-    width: 100%;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-}
-
-.total {
-    color: yellow;
-    font-size: 18px;
-}
-
-.gcash {
-    text-align: center;
-}
-
-@keyframes fade {
-    from {opacity:0;}
-    to {opacity:1;}
-}
-</style>
+  <title>3 Meal's Food Cart</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<h1>🍽️ 3 Meal's Food Cart</h1>
+<header>
+  <img src="logo.png" class="logo">
+  <h1>3 Meal's Food Cart</h1>
+</header>
 
-<div class="box">
-<h2>🍱 Menu</h2>
+<nav>
+  <a href="index.html">Home</a>
+  <a href="menu.html">Menu</a>
+  <a href="order.html">Order</a>
+</nav>
 
-<input type="checkbox" value="60" data-name="Lumpiang Shanghai Rice"> Lumpiang Shanghai Rice - ₱60<br>
-<input type="checkbox" value="80" data-name="Chicken Pastil Rice"> Chicken Pastil Rice - ₱80<br>
-<input type="checkbox" value="70" data-name="Siomai Rice"> Siomai Rice - ₱70<br>
-
-</div>
-
-<div class="box">
-<h2>👤 Customer Info</h2>
-
-Name:
-<input type="text" id="name">
-
-Address (Bahay Toro / Toro Hills):
-<input type="text" id="address">
-
-</div>
-
-<div class="box">
-<h2>💳 GCash Payment</h2>
-
-<div class="gcash">
-<img src="https://upload.wikimedia.org/wikipedia/commons/1/1c/GCash_logo.png" width="120"><br><br>
-
-<b>GCash Number:</b><br>
-<span style="color:yellow; font-size:18px;">09359335066</span><br><br>
-
-<p>✔ Send payment before placing order</p>
-
-<button onclick="copyNumber()">Copy GCash Number</button>
-</div>
-
-</div>
-
-<div class="box">
-<h2>📋 Order Summary</h2>
-
-<div id="summary"></div>
-<div class="total" id="total">Total: ₱0</div>
-
-</div>
-
-<button onclick="placeOrder()">🚀 Place Order</button>
-
-<script>
-function copyNumber() {
-    navigator.clipboard.writeText("09359335066");
-    alert("GCash number copied!");
-}
-
-function placeOrder() {
-    let name = document.getElementById("name").value;
-    let address = document.getElementById("address").value;
-    let items = document.querySelectorAll("input[type=checkbox]:checked");
-
-    let total = 0;
-    let orderList = "";
-
-    items.forEach(item => {
-        total += parseInt(item.value);
-        orderList += item.getAttribute("data-name") + ", ";
-    });
-
-    if (!name || !address || items.length === 0) {
-        alert("Please complete your order!");
-        return;
-    }
-
-    let message = 
-`Order from 3 Meal's Food Cart
-Name: ${name}
-Address: ${address}
-Order: ${orderList}
-Total: ₱${total}
-Free Delivery (Bahay Toro / Toro Hills)`;
-
-    alert("Order Sent! Copy this and send via Messenger:\n\n" + message);
-}
-</script>
+<section class="hero">
+  <h2>Delicious & Affordable Meals 🍴</h2>
+  <p>Free delivery in Bahay Toro / Toro Hills</p>
+</section>
 
 </body>
 </html>
