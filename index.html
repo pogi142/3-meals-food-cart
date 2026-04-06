@@ -6,148 +6,145 @@
 
 <style>
 body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #ff758c, #ff7eb3);
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
   margin: 0;
-  text-align: center;
-  color: white;
 }
 
-/* BUBBLE TEXT */
-h1 {
-  font-size: 38px;
-  margin-top: 20px;
-  text-shadow: 2px 2px 0px #ff3d68;
+/* HEADER */
+.header {
+  background: #111;
+  color: white;
+  padding: 20px;
+  text-align: center;
 }
+
+.header h1 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.header p {
+  margin: 5px 0 0;
+  font-size: 14px;
+  color: #ccc;
+}
+
+/* PAGE */
+.page { display: none; padding: 20px; }
+.active { display: block; }
 
 /* CARD */
-.container {
+.card {
   background: white;
-  color: black;
-  margin: 20px auto;
-  padding: 25px;
-  border-radius: 30px;
-  width: 92%;
+  padding: 20px;
+  border-radius: 12px;
   max-width: 420px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-  animation: pop 0.4s ease;
+  margin: auto;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
-
-@keyframes pop {
-  0% {transform: scale(0.8); opacity: 0;}
-  100% {transform: scale(1); opacity: 1;}
-}
-
-/* BIG TEXT */
-h2 { font-size: 26px; }
-p { font-size: 20px; }
 
 /* BUTTON */
 button {
-  padding: 14px 20px;
-  margin: 8px;
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
   border: none;
-  border-radius: 25px;
-  background: #ff5e62;
+  background: #222;
   color: white;
-  font-size: 18px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:hover {
-  transform: scale(1.1);
-  background: #ff2e35;
-}
-
-input {
-  padding: 14px;
-  border-radius: 15px;
-  border: 1px solid #ccc;
-  width: 85%;
   font-size: 16px;
-  margin: 5px;
+  border-radius: 8px;
+}
+
+button:hover { background: #000; }
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
 .hidden { display: none; }
-
-/* TRACKER */
-.tracker {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-
-.circle {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: gray;
-  margin: auto;
-}
-
-.active { background: #4CAF50; }
 </style>
 </head>
 
 <body>
 
-<h1>🍱 3 Meals Food Cart</h1>
-
-<!-- INFO -->
-<div class="container">
-  <h2>Your Details</h2>
-  <input id="name" placeholder="Your Name"><br>
-  <input id="address" placeholder="Your Address">
+<!-- WELCOME HEADER -->
+<div class="header">
+  <h1>🍱 Welcome to 3 Meal's Food Cart</h1>
+  <p>"Good food, fast service, happy customers."</p>
 </div>
 
-<!-- MENU -->
-<div class="container">
-  <h2>Menu</h2>
+<!-- PAGE 1 -->
+<div class="page active" id="p1">
+  <div class="card">
+    <h3>Menu</h3>
 
-  <p>🥢 Lumpiang Shanghai Rice - ₱60</p>
-  <button onclick="add('Lumpia',60)">Add</button>
+    <p>Lumpiang Shanghai Rice - ₱60</p>
+    <button onclick="add('Lumpia',60)">Add</button>
 
-  <p>🍗 Chicken Pastil Rice - ₱70</p>
-  <button onclick="add('Pastil',70)">Add</button>
+    <p>Chicken Pastil Rice - ₱70</p>
+    <button onclick="add('Pastil',70)">Add</button>
 
-  <p>🥟 Siomai Rice - ₱50</p>
-  <button onclick="add('Siomai',50)">Add</button>
+    <p>Siomai Rice - ₱50</p>
+    <button onclick="add('Siomai',50)">Add</button>
+
+    <p>Cart: <span id="cart">Empty</span></p>
+    <p>Total: ₱<span id="total">0</span></p>
+
+    <button onclick="go(2)">Next</button>
+  </div>
 </div>
 
-<!-- CART -->
-<div class="container">
-  <h2>Your Cart 🛒</h2>
-  <p id="cart">Empty</p>
-  <h2>₱<span id="total">0</span></h2>
-  <button onclick="checkout()">Checkout</button>
+<!-- PAGE 2 -->
+<div class="page" id="p2">
+  <div class="card">
+    <h3>Customer Info</h3>
+
+    <input id="name" placeholder="Full Name">
+    <input id="number" placeholder="Phone Number">
+
+    <select id="method" onchange="toggleDelivery()">
+      <option value="">Select Option</option>
+      <option value="pickup">Pick Up</option>
+      <option value="delivery">Delivery</option>
+    </select>
+
+    <div id="deliveryArea" class="hidden">
+      <select id="area">
+        <option>Road 14 - Bahay Toro</option>
+        <option>Road 15 - Bahay Toro</option>
+        <option>Road 16 - Bahay Toro</option>
+        <option>Road 17 - Bahay Toro</option>
+        <option>Road 18 - Bahay Toro</option>
+        <option>Road 19 - Bahay Toro</option>
+        <option>Road 20 - Bahay Toro</option>
+      </select>
+
+      <input id="address" placeholder="Full Address">
+    </div>
+
+    <button onclick="go(3)">Next</button>
+  </div>
 </div>
 
-<!-- PAYMENT -->
-<div class="container hidden" id="payBox">
-  <h2>Payment Method</h2>
-  <button onclick="pay('cash')">💵 Cash</button>
-  <button onclick="pay('gcash')">📱 GCash</button>
-</div>
+<!-- PAGE 3 -->
+<div class="page" id="p3">
+  <div class="card">
+    <h3>Payment</h3>
 
-<!-- GCASH -->
-<div class="container hidden" id="gcashBox">
-  <h2>Scan & Pay</h2>
-  <img src="gcash.png" width="200"><br><br>
-  <input type="file" id="proof"><br>
-  <button onclick="confirmGCash()">Confirm Payment</button>
-</div>
+    <button onclick="order('Cash')">Cash</button>
+    <button onclick="order('GCash')">GCash</button>
 
-<!-- CONFIRM -->
-<div class="container hidden" id="confirmBox">
-  <h2>🎉 Order Sent!</h2>
-  <p id="details"></p>
-
-  <div class="tracker">
-    <div><div class="circle active" id="s1"></div>Order</div>
-    <div><div class="circle" id="s2"></div>Cooking</div>
-    <div><div class="circle" id="s3"></div>Delivery</div>
-    <div><div class="circle" id="s4"></div>Done</div>
+    <div id="gcashBox" class="hidden">
+      <p>Scan to Pay</p>
+      <img src="gcash.png" width="200"><br><br>
+      <input type="file" id="proof">
+      <button onclick="confirmGCash()">Confirm Payment</button>
+    </div>
   </div>
 </div>
 
@@ -162,77 +159,56 @@ function add(item, price){
   document.getElementById("total").innerText = total;
 }
 
-function checkout(){
-  let name = document.getElementById("name").value;
-  let address = document.getElementById("address").value;
-
-  if(!name || !address){
-    alert("Fill name and address!");
-    return;
-  }
-
-  if(cart.length === 0){
-    alert("Cart empty!");
-    return;
-  }
-
-  document.getElementById("payBox").classList.remove("hidden");
+function go(page){
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("p"+page).classList.add("active");
 }
 
-function pay(type){
-  if(type === "cash"){
-    sendOrder("Cash");
-  } else {
+function toggleDelivery(){
+  let method = document.getElementById("method").value;
+  document.getElementById("deliveryArea").classList.toggle("hidden", method !== "delivery");
+}
+
+function order(type){
+  if(type === "GCash"){
     document.getElementById("gcashBox").classList.remove("hidden");
+  } else {
+    sendOrder("Cash");
   }
 }
 
 function confirmGCash(){
   let file = document.getElementById("proof").files[0];
-
   if(!file){
     alert("Upload proof!");
     return;
   }
-
   sendOrder("GCash Paid");
-}
-
-function orderID(){
-  return "ORD-" + Math.floor(Math.random()*1000000);
 }
 
 function sendOrder(payment){
   let name = document.getElementById("name").value;
-  let address = document.getElementById("address").value;
-  let id = orderID();
+  let number = document.getElementById("number").value;
+  let method = document.getElementById("method").value;
+  let area = document.getElementById("area")?.value || "";
+  let address = document.getElementById("address")?.value || "";
 
-  let message =
-  "🧾 ORDER\n" +
-  "Order ID: " + id + "\n" +
+  let msg =
+  "ORDER\n" +
   "Name: " + name + "\n" +
+  "Phone: " + number + "\n" +
+  "Type: " + method + "\n" +
+  "Area: " + area + "\n" +
   "Address: " + address + "\n" +
   "Items: " + cart.join(", ") + "\n" +
   "Total: ₱" + total + "\n" +
   "Payment: " + payment;
 
-  // 📘 Messenger
-  let messenger = "https://m.me/SaifHossamLapitan?text=" + encodeURIComponent(message);
-
-  // 📱 SMS fallback
-  let sms = "sms:09525766589?body=" + encodeURIComponent(message);
-
+  // Messenger
+  let messenger = "https://m.me/SaifHossamLapitan?text=" + encodeURIComponent(msg);
   window.open(messenger, "_blank");
-  window.open(sms, "_blank");
 
-  document.getElementById("confirmBox").classList.remove("hidden");
-  document.getElementById("details").innerText = message;
-
-  new Audio("https://www.soundjay.com/buttons/sounds/button-09.mp3").play();
-
-  setTimeout(()=>{ s2.classList.add("active"); },2000);
-  setTimeout(()=>{ s3.classList.add("active"); },5000);
-  setTimeout(()=>{ s4.classList.add("active"); },8000);
+  alert("Order sent!");
 }
 </script>
 
