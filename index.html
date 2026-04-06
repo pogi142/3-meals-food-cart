@@ -33,8 +33,9 @@ input,select{width:100%;padding:10px;margin:8px 0;border-radius:10px}
 <option value="cash">Cash</option>
 <option value="gcash">GCash</option>
 </select><div id="gcashBox" style="display:none">
-<p>Pay to: 09525766589</p>
-<img src="gcash.png" width="150">
+<p><strong>Scan & Pay using GCash</strong></p>
+<img src="gcash.png" width="180">
+<p style="color:red;">⚠️ Pay FIRST before confirming order</p>
 </div><button onclick="checkout()">Order Now</button>
 
 </div><div class="receipt" id="receipt" style="display:none"></div><div class="map" id="map" style="display:none">
@@ -89,9 +90,21 @@ if(pos>=90){clearInterval(ride);alert("Order Delivered!");}
 },500);
 
 // send SMS
-window.location.href=`sms:09525766589?body=New Order Total ₱${total}`;
+let fullOrder = `ORDER DETAILS
+Name: ${name}
+Phone: ${phone}
+-------------------
+` +
+cart.map(i=>`${i.name} - ₱${i.price}`).join('
+') +
+`
+-------------------
+Order Type: ${delivery}
+Total: ₱${total}
+Payment: ${payment}`;
+window.location.href=`sms:09525766589?body=${encodeURIComponent(fullOrder)}`;;
 }
 
 displayMenu();
 </script></body>
-</html>
+</html> 
