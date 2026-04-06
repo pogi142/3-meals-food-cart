@@ -7,40 +7,52 @@
 <style>
 body {
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  background: linear-gradient(135deg, #ff758c, #ff7eb3);
   margin: 0;
   text-align: center;
+  color: white;
 }
 
+/* BUBBLE TEXT */
+h1 {
+  font-size: 38px;
+  margin-top: 20px;
+  text-shadow: 2px 2px 0px #ff3d68;
+}
+
+/* CARD */
 .container {
   background: white;
+  color: black;
   margin: 20px auto;
-  padding: 20px;
-  border-radius: 25px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  padding: 25px;
+  border-radius: 30px;
+  width: 92%;
+  max-width: 420px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
   animation: pop 0.4s ease;
 }
 
 @keyframes pop {
-  0% { transform: scale(0.8); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {transform: scale(0.8); opacity: 0;}
+  100% {transform: scale(1); opacity: 1;}
 }
 
-h1 {
-  color: white;
-  padding-top: 20px;
-}
+/* BIG TEXT */
+h2 { font-size: 26px; }
+p { font-size: 20px; }
 
+/* BUTTON */
 button {
-  padding: 10px 15px;
-  margin: 5px;
+  padding: 14px 20px;
+  margin: 8px;
   border: none;
-  border-radius: 20px;
+  border-radius: 25px;
   background: #ff5e62;
   color: white;
+  font-size: 18px;
   cursor: pointer;
+  transition: 0.3s;
 }
 
 button:hover {
@@ -48,14 +60,33 @@ button:hover {
   background: #ff2e35;
 }
 
-.hidden {
-  display: none;
+input {
+  padding: 14px;
+  border-radius: 15px;
+  border: 1px solid #ccc;
+  width: 85%;
+  font-size: 16px;
+  margin: 5px;
 }
 
-.total {
-  font-size: 18px;
-  font-weight: bold;
+.hidden { display: none; }
+
+/* TRACKER */
+.tracker {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
 }
+
+.circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: gray;
+  margin: auto;
+}
+
+.active { background: #4CAF50; }
 </style>
 </head>
 
@@ -63,111 +94,145 @@ button:hover {
 
 <h1>🍱 3 Meals Food Cart</h1>
 
+<!-- INFO -->
+<div class="container">
+  <h2>Your Details</h2>
+  <input id="name" placeholder="Your Name"><br>
+  <input id="address" placeholder="Your Address">
+</div>
+
 <!-- MENU -->
 <div class="container">
   <h2>Menu</h2>
 
-  <p>Lumpiang Shanghai Rice - ₱60</p>
-  <button onclick="addToCart('Lumpiang Shanghai Rice',60)">Add</button>
+  <p>🥢 Lumpiang Shanghai Rice - ₱60</p>
+  <button onclick="add('Lumpia',60)">Add</button>
 
-  <p>Chicken Pastil Rice - ₱70</p>
-  <button onclick="addToCart('Chicken Pastil Rice',70)">Add</button>
+  <p>🍗 Chicken Pastil Rice - ₱70</p>
+  <button onclick="add('Pastil',70)">Add</button>
 
-  <p>Siomai Rice - ₱50</p>
-  <button onclick="addToCart('Siomai Rice',50)">Add</button>
+  <p>🥟 Siomai Rice - ₱50</p>
+  <button onclick="add('Siomai',50)">Add</button>
 </div>
 
 <!-- CART -->
 <div class="container">
   <h2>Your Cart 🛒</h2>
-  <p id="cartList">Empty</p>
-  <p class="total">₱<span id="total">0</span></p>
-
+  <p id="cart">Empty</p>
+  <h2>₱<span id="total">0</span></h2>
   <button onclick="checkout()">Checkout</button>
 </div>
 
 <!-- PAYMENT -->
-<div class="container hidden" id="paymentBox">
-  <h2>Choose Payment</h2>
-
-  <button onclick="choosePayment('cash')">💵 Cash</button>
-  <button onclick="choosePayment('gcash')">📱 GCash</button>
+<div class="container hidden" id="payBox">
+  <h2>Payment Method</h2>
+  <button onclick="pay('cash')">💵 Cash</button>
+  <button onclick="pay('gcash')">📱 GCash</button>
 </div>
 
 <!-- GCASH -->
 <div class="container hidden" id="gcashBox">
   <h2>Scan & Pay</h2>
-
-  <img src="gcash.png" width="180"><br><br>
-
-  <input type="file" id="proof"><br><br>
-
+  <img src="gcash.png" width="200"><br><br>
+  <input type="file" id="proof"><br>
   <button onclick="confirmGCash()">Confirm Payment</button>
 </div>
 
 <!-- CONFIRM -->
 <div class="container hidden" id="confirmBox">
-  <h2>🎉 Order Confirmed</h2>
-  <p id="orderDetails"></p>
+  <h2>🎉 Order Sent!</h2>
+  <p id="details"></p>
+
+  <div class="tracker">
+    <div><div class="circle active" id="s1"></div>Order</div>
+    <div><div class="circle" id="s2"></div>Cooking</div>
+    <div><div class="circle" id="s3"></div>Delivery</div>
+    <div><div class="circle" id="s4"></div>Done</div>
+  </div>
 </div>
 
 <script>
 let cart = [];
 let total = 0;
 
-function addToCart(item, price) {
+function add(item, price){
   cart.push(item);
   total += price;
-
-  document.getElementById("cartList").innerText = cart.join(", ");
+  document.getElementById("cart").innerText = cart.join(", ");
   document.getElementById("total").innerText = total;
 }
 
-function checkout() {
-  if(cart.length === 0){
-    alert("Cart is empty!");
+function checkout(){
+  let name = document.getElementById("name").value;
+  let address = document.getElementById("address").value;
+
+  if(!name || !address){
+    alert("Fill name and address!");
     return;
   }
 
-  document.getElementById("paymentBox").classList.remove("hidden");
+  if(cart.length === 0){
+    alert("Cart empty!");
+    return;
+  }
+
+  document.getElementById("payBox").classList.remove("hidden");
 }
 
-function choosePayment(type) {
+function pay(type){
   if(type === "cash"){
-    finalizeOrder("Cash");
+    sendOrder("Cash");
   } else {
     document.getElementById("gcashBox").classList.remove("hidden");
   }
 }
 
-function confirmGCash() {
+function confirmGCash(){
   let file = document.getElementById("proof").files[0];
 
   if(!file){
-    alert("Upload proof first!");
+    alert("Upload proof!");
     return;
   }
 
-  finalizeOrder("GCash Paid");
+  sendOrder("GCash Paid");
 }
 
-function generateOrderID() {
-  return "ORD-" + Math.floor(Math.random() * 1000000);
+function orderID(){
+  return "ORD-" + Math.floor(Math.random()*1000000);
 }
 
-function finalizeOrder(payment) {
-  let orderID = generateOrderID();
+function sendOrder(payment){
+  let name = document.getElementById("name").value;
+  let address = document.getElementById("address").value;
+  let id = orderID();
+
+  let message =
+  "🧾 ORDER\n" +
+  "Order ID: " + id + "\n" +
+  "Name: " + name + "\n" +
+  "Address: " + address + "\n" +
+  "Items: " + cart.join(", ") + "\n" +
+  "Total: ₱" + total + "\n" +
+  "Payment: " + payment;
+
+  // 📘 Messenger
+  let messenger = "https://m.me/SaifHossamLapitan?text=" + encodeURIComponent(message);
+
+  // 📱 SMS fallback
+  let sms = "sms:09525766589?body=" + encodeURIComponent(message);
+
+  window.open(messenger, "_blank");
+  window.open(sms, "_blank");
 
   document.getElementById("confirmBox").classList.remove("hidden");
+  document.getElementById("details").innerText = message;
 
-  document.getElementById("orderDetails").innerText =
-    "Order ID: " + orderID +
-    "\nItems: " + cart.join(", ") +
-    "\nTotal: ₱" + total +
-    "\nPayment: " + payment;
+  new Audio("https://www.soundjay.com/buttons/sounds/button-09.mp3").play();
 
-  let sound = new Audio("https://www.soundjay.com/buttons/sounds/button-09.mp3");
-  sound.play();
+  setTimeout(()=>{ s2.classList.add("active"); },2000);
+  setTimeout(()=>{ s3.classList.add("active"); },5000);
+  setTimeout(()=>{ s4.classList.add("active"); },8000);
 }
 </script>
 
