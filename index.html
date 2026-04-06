@@ -9,13 +9,15 @@ body{font-family:'Poppins',sans-serif;margin:0;background:linear-gradient(270deg
 #welcome{position:fixed;width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#ff6f61;color:white;font-size:35px;z-index:10;animation:fadeOut 1s forwards;animation-delay:3s}
 @keyframes fadeOut{to{opacity:0;visibility:hidden}}
 .container{padding:20px}
-.menu-item{background:white;margin:10px;padding:15px;border-radius:20px;display:flex;justify-content:space-between}
-button{padding:10px;border:none;border-radius:15px;background:#ff6f61;color:white}
-.cart{background:white;padding:20px;border-radius:20px;margin-top:20px}
-input,select{width:100%;padding:10px;margin:8px 0;border-radius:10px}
+.menu-item{background:white;margin:10px;padding:15px;border-radius:20px;display:flex;justify-content:space-between;box-shadow:0 10px 20px rgba(0,0,0,0.2)}
+button{padding:10px;border:none;border-radius:15px;background:#ff6f61;color:white;cursor:pointer}
+.cart{background:white;padding:20px;border-radius:20px;margin-top:20px;box-shadow:0 10px 20px rgba(0,0,0,0.2)}
+input,select,textarea{width:100%;padding:10px;margin:8px 0;border-radius:10px}
 .receipt{background:white;padding:20px;margin-top:20px;border-radius:20px}
-.map{margin-top:20px;height:200px;background:#ddd;border-radius:20px;display:flex;align-items:center;justify-content:center;font-weight:bold}
-.rider{position:absolute;font-size:30px}
+.map{margin-top:20px;height:200px;background:#eee;border-radius:20px;position:relative;overflow:hidden}
+.rider{position:absolute;font-size:30px;left:0;top:50%;transform:translateY(-50%)}
+.bubble{position:fixed;bottom:-50px;background:rgba(255,255,255,0.4);border-radius:50%;animation:float 10s infinite}
+@keyframes float{to{transform:translateY(-100vh)}}
 </style>
 </head>
 <body>
@@ -25,11 +27,13 @@ input,select{width:100%;padding:10px;margin:8px 0;border-radius:10px}
 <div id="menu"></div><div class="cart">
 <h2>Cart</h2>
 <div id="cartItems"></div>
-<p>Total: ₱<span id="total">0</span></p><input id="name" placeholder="Full Name">
-<input id="phone" placeholder="Phone"><select id="delivery">
+<p>Total: ₱<span id="total">0</span></p><h3>Customer Info</h3>
+<input id="name" placeholder="Full Name">
+<input id="phone" placeholder="Phone">
+<textarea id="address" placeholder="Address"></textarea><select id="delivery">
 <option value="pickup">Pick Up</option>
 <option value="delivery">Delivery (+₱5)</option>
-</select><select id="payment">
+</select><select id="payment" onchange="showGCash()">
 <option value="cash">Cash</option>
 <option value="gcash">GCash</option>
 </select><div id="gcashBox" style="display:none">
@@ -46,11 +50,18 @@ const menu=[
 {name:"Chicken Pastil Rice",price:70},
 {name:"Siomai Rice",price:50}
 ];
+
 let cart=[];
 
 function displayMenu(){
+const menuDiv=document.getElementById("menu");
+menuDiv.innerHTML=""; // FIX: clear first
 menu.forEach((item,i)=>{
-document.getElementById("menu").innerHTML+=`<div class="menu-item"><span>${item.name} - ₱${item.price}</span><button onclick="addToCart(${i})">Add</button></div>`;
+menuDiv.innerHTML += `
+<div class="menu-item">
+<span>${item.name} - ₱${item.price}</span>
+<button onclick="addToCart(${i})">Add</button>
+</div>`;
 });
 }
 
@@ -63,36 +74,129 @@ document.getElementById("cartItems").innerHTML=html;
 document.getElementById("total").innerText=total;
 }
 
-document.getElementById("payment").addEventListener("change",()=>{
+function showGCash(){
 document.getElementById("gcashBox").style.display=
 document.getElementById("payment").value=="gcash"?"block":"none";
-});
+}
 
 function checkout(){
+let name=document.getElementById("name").value;
+let phone=document.getElementById("phone").value;
+let address=document.getElementById("address").value;
+let delivery=document.getElementById("delivery").value;
+let payment=document.getElementById("payment").value;
+
 let total=cart.reduce((s,i)=>s+i.price,0);
-if(document.getElementById("delivery").value=="delivery") total+=5;
+if(delivery=="delivery") total+=5;
 
-// show receipt
-let r=document.getElementById("receipt");
-r.style.display="block";
-r.innerHTML=`<h2>Receipt</h2><p>Total: ₱${total}</p>`;
+let receipt=document.getElementById("receipt");
+receipt.style.display="block";
+receipt.innerHTML=`<h2>Receipt</h2>
+<p>${name}</p>
+<p>${address}</p>
+${cart.map(i=>`<p>${i.name} - ₱${i.price}</p>`).join("")}
+<p><strong>Total: ₱${total}</strong></p>`;
 
-// show rider map
+// rider
 let map=document.getElementById("map");
-map.style.display="flex";
+map.style.display="block";
 let rider=document.getElementById("rider");
 let pos=0;
-
 let ride=setInterval(()=>{
 pos+=5;
 rider.style.left=pos+"%";
-if(pos>=90){clearInterval(ride);alert("Order Delivered!");}
+if(pos>=90){clearInterval(ride);alert("Delivered!");}
 },500);
 
-// send SMS
+// SMS full details
+let fullOrder = `ORDER DETAILS\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n-------------------\n` +
+cart.map(i=>`${i.name} - ₱${i.price}`).join('\n') +
+`\n-------------------\nOrder Type: ${delivery}\nTotal: ₱${total}\nPayment: ${payment}`;
+
+window.location.href=`sms:09525766589?body=${encodeURIComponent(fullOrder)}`;
+}
+
+// bubbles
+for(let i=0;i<15;i++){let b=document.createElement("div");b.className="bubble";b.style.width=b.style.height=Math.random()*40+20+"px";b.style.left=Math.random()*100+"vw";b.style.animationDuration=(Math.random()*5+5)+"s";document.body.appendChild(b)}
+
+displayMenu();
+// INVENTORY SYSTEM
+let inventory={
+"Lumpiang Shanghai Rice":10,
+"Chicken Pastil Rice":10,
+"Siomai Rice":10
+};
+
+function displayMenu(){
+const menuDiv=document.getElementById("menu");
+menuDiv.innerHTML="";
+menu.forEach((item,i)=>{
+menuDiv.innerHTML += `
+<div class="menu-item">
+<span>${item.name} (Stock: ${inventory[item.name]}) - ₱${item.price}</span>
+<button ${inventory[item.name]<=0?"disabled":""} onclick="addToCart(${i})">${inventory[item.name]<=0?"Out of Stock":"Add"}</button>
+</div>`;
+});
+}
+
+function addToCart(i){
+let item=menu[i];
+if(inventory[item.name]>0){
+cart.push(item);
+inventory[item.name]--;
+updateCart();
+displayMenu();
+}
+}
+
+// AUTO CANCEL IF NOT PAID
+function autoCancel(){
+setTimeout(()=>{
+if(document.getElementById("payment").value=="gcash"){
+alert("Order cancelled: No payment received.");
+cart=[];
+updateCart();
+}
+},30000); // 30 seconds
+}
+
+function checkout(){
+let name=document.getElementById("name").value;
+let phone=document.getElementById("phone").value;
+let address=document.getElementById("address").value;
+let delivery=document.getElementById("delivery").value;
+let payment=document.getElementById("payment").value;
+
+let total=cart.reduce((s,i)=>s+i.price,0);
+if(delivery=="delivery") total+=5;
+
+let receipt=document.getElementById("receipt");
+receipt.style.display="block";
+receipt.innerHTML=`<h2>Receipt</h2>
+<p>${name}</p>
+<p>${address}</p>
+${cart.map(i=>`<p>${i.name} - ₱${i.price}</p>`).join("")}
+<p><strong>Total: ₱${total}</strong></p>`;
+
+// start auto cancel timer if gcash
+if(payment=="gcash") autoCancel();
+
+// rider
+let map=document.getElementById("map");
+map.style.display="block";
+let rider=document.getElementById("rider");
+let pos=0;
+let ride=setInterval(()=>{
+pos+=5;
+rider.style.left=pos+"%";
+if(pos>=90){clearInterval(ride);alert("Delivered!");}
+},500);
+
+// SMS full details
 let fullOrder = `ORDER DETAILS
 Name: ${name}
 Phone: ${phone}
+Address: ${address}
 -------------------
 ` +
 cart.map(i=>`${i.name} - ₱${i.price}`).join('
@@ -102,9 +206,8 @@ cart.map(i=>`${i.name} - ₱${i.price}`).join('
 Order Type: ${delivery}
 Total: ₱${total}
 Payment: ${payment}`;
-window.location.href=`sms:09525766589?body=${encodeURIComponent(fullOrder)}`;;
-}
 
-displayMenu();
+window.location.href=`sms:09525766589?body=${encodeURIComponent(fullOrder)}`;
+}
 </script></body>
-</html> 
+</html>
