@@ -1,214 +1,271 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>3 Meal's Food Cart</title>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bahay Toro Food Delivery</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
 body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
-  background: #0f0f0f;
-  color: white;
-}
-
-/* BUBBLE HEADER */
-header {
+  background: linear-gradient(135deg, #74ebd5, #9face6);
   text-align: center;
-  padding: 20px;
-  background: linear-gradient(135deg, #ff4d6d, #ffbe0b);
-  border-bottom-left-radius: 30px;
-  border-bottom-right-radius: 30px;
 }
 
-h1 {
-  font-size: 28px;
-  background: white;
-  color: black;
-  display: inline-block;
-  padding: 10px 20px;
-  border-radius: 50px; /* BUBBLE TEXT */
+/* WELCOME */
+#welcome {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: #66a6ff;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  animation: fadeOut 3s forwards;
+  animation-delay: 2s;
+  z-index: 999;
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
 }
 
 /* SEARCH */
-.search-box {
-  padding: 15px;
-  text-align: center;
-}
-
-.search-box input {
-  width: 80%;
+.search {
   padding: 12px;
-  border-radius: 50px;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 25px;
   border: none;
-  font-size: 16px;
+  margin: 20px;
 }
 
-/* MENU */
-.menu {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+/* PRODUCTS */
+.products {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 15px;
-  padding: 20px;
 }
 
-/* FOOD CARD */
-.item {
-  background: #1a1a1a;
+.card {
+  background: white;
   padding: 15px;
   border-radius: 20px;
-  text-align: center;
-  box-shadow: 0 5px 15px rgba(255,0,0,0.2);
-  transition: 0.3s;
+  width: 170px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
-.item:hover {
-  transform: scale(1.05);
-}
-
-.item h2 {
-  color: #ffbe0b;
-}
-
-/* BUTTON */
 button {
-  background: linear-gradient(135deg, #ff4d6d, #ffbe0b);
+  background: #66a6ff;
+  color: white;
   border: none;
-  padding: 10px;
-  border-radius: 50px;
-  color: black;
-  font-weight: bold;
-  width: 100%;
-  margin-top: 10px;
+  padding: 8px;
+  border-radius: 15px;
 }
 
 /* CART */
 .cart {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: #000;
-  padding: 15px;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
+  background: white;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
 }
 
-/* INPUT */
+/* ORDER FORM */
 input {
-  width: 100%;
+  width: 90%;
   padding: 10px;
-  margin: 5px 0;
-  border-radius: 10px;
-  border: none;
+  margin: 5px;
+  border-radius: 15px;
+  border: 1px solid #ccc;
 }
 
-/* QR */
-.qr {
-  width: 100px;
-  display: block;
-  margin: auto;
+/* POPUP */
+#popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  z-index: 1000;
+  transition: 0.3s;
+}
+
+#popup.show {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* BUBBLES */
+.bubble {
+  position: fixed;
+  bottom: -50px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+  to { transform: translateY(-100vh); }
 }
 </style>
-
 </head>
 
 <body>
 
-<header>
-  <h1>🍽️ 3 Meal's Food Cart</h1>
-</header>
-
-<div class="search-box">
-  <input type="text" id="search" placeholder="Search food..." onkeyup="searchFood()">
+<!-- WELCOME -->
+<div id="welcome">
+  <h1>🍽️ Welcome!</h1>
+  <p>Bahay Toro Food Delivery</p>
 </div>
 
-<div class="menu">
+<h2>🍔 Order Now</h2>
 
-  <div class="item" data-name="lumpia">
-    <h2>Lumpiang Shanghai Rice</h2>
-    <p>₱120</p>
-    <button onclick="addToCart('Lumpiang Shanghai',120)">Add</button>
-  </div>
+<input class="search" placeholder="Search food..." onkeyup="searchProduct()">
 
-  <div class="item" data-name="pastil">
-    <h2>Chicken Pastil Rice</h2>
-    <p>₱120</p>
-    <button onclick="addToCart('Chicken Pastil',120)">Add</button>
-  </div>
+<div class="products" id="products"></div>
 
-  <div class="item" data-name="siomai">
-    <h2>Siomai Rice</h2>
-    <p>₱100</p>
-    <button onclick="addToCart('Siomai',100)">Add</button>
-  </div>
-
-</div>
-
-<!-- CART -->
 <div class="cart">
-  <div id="cartItems"></div>
-  <h3>Total: ₱<span id="total">0</span></h3>
+  <h3>🛒 Cart</h3>
+  <ul id="cart"></ul>
+  <b>Total: ₱<span id="total">0</span></b>
 
-  <input type="text" id="name" placeholder="Your Name">
-  <input type="text" id="address" placeholder="Your Address">
+  <h3>📦 Your Details</h3>
+  <input id="name" placeholder="Name">
+  <input id="address" placeholder="Address">
+  <input id="phone" placeholder="Phone">
 
-  <img src="gcash.png" class="qr">
-  <p style="text-align:center;">GCash: 09359335066</p>
+  <button onclick="order()">Place Order</button>
 
-  <button onclick="checkout()">Checkout</button>
+  <h4>💳 GCash</h4>
+  <img src="qr.png" width="120">
 </div>
+
+<div id="popup">
+  <h2>🎉 Order Received!</h2>
+  <p id="summary"></p>
+</div>
+
+<div id="qrcode"></div>
 
 <script>
-let cart = [];
+let products = [
+  {name:"Lumpiang Shanghai Rice", price:60},
+  {name:"Chicken Pastil Rice", price:70},
+  {name:"Siomai Rice", price:50}
+];
 
-function addToCart(name, price) {
-  let item = cart.find(i => i.name === name);
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  if(item){
-    item.qty++;
-  } else {
-    cart.push({name, price, qty:1});
-  }
-
-  updateCart();
+function saveCart() {
+  localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-function updateCart() {
-  let cartDiv = document.getElementById("cartItems");
-  let total = 0;
-  cartDiv.innerHTML = "";
-
-  cart.forEach(item => {
-    total += item.price * item.qty;
-
-    cartDiv.innerHTML += 
-      `<p>${item.name} x${item.qty} - ₱${item.price * item.qty}</p>`;
+function display(list){
+  let html="";
+  list.forEach((p,i)=>{
+    html+=`
+    <div class="card">
+      <h4>${p.name}</h4>
+      <p>₱${p.price}</p>
+      <small style="color:green;">Free Delivery - Bahay Toro</small><br>
+      <button onclick="add(${i})">Add</button>
+    </div>`;
   });
-
-  document.getElementById("total").innerText = total;
+  document.getElementById("products").innerHTML=html;
 }
 
-function checkout() {
-  let name = document.getElementById("name").value;
-  let address = document.getElementById("address").value;
+function add(i){
+  cart.push(products[i]);
+  update();
+  saveCart();
+}
 
-  if(cart.length === 0 || !name || !address){
-    alert("Complete your order!");
+function update(){
+  let html="";
+  let total=0;
+  cart.forEach((c,index)=>{
+    html+=`
+    <li>${c.name} ₱${c.price}
+    <button onclick="removeItem(${index})">❌</button></li>`;
+    total+=c.price;
+  });
+  document.getElementById("cart").innerHTML=html;
+  document.getElementById("total").innerText=total;
+}
+
+function removeItem(i){
+  cart.splice(i,1);
+  update();
+  saveCart();
+}
+
+function searchProduct(){
+  let val=document.querySelector(".search").value.toLowerCase();
+  let filtered=products.filter(p=>p.name.toLowerCase().includes(val));
+  display(filtered);
+}
+
+function order(){
+  let name=document.getElementById("name").value;
+  let address=document.getElementById("address").value;
+  let phone=document.getElementById("phone").value;
+
+  if(!name||!address||!phone||cart.length===0){
+    alert("Complete order first!");
     return;
   }
 
-  alert("Order placed! Please send payment via GCash.");
-}
+  let text=`Order from ${name}\n${address}\n${phone}\n\n`;
+  let total=0;
 
-function searchFood() {
-  let input = document.getElementById("search").value.toLowerCase();
-  let items = document.querySelectorAll(".item");
-
-  items.forEach(item => {
-    let name = item.getAttribute("data-name");
-    item.style.display = name.includes(input) ? "block" : "none";
+  cart.forEach(c=>{
+    text+=`${c.name} ₱${c.price}\n`;
+    total+=c.price;
   });
+
+  text+=`\nTotal: ₱${total}`;
+
+  document.getElementById("summary").innerText=text;
+  document.getElementById("popup").classList.add("show");
+
+  // OPEN SMS (CHANGE NUMBER)
+  window.location.href = `sms:09359335066?body=${encodeURIComponent(text)}`;
+
+  cart=[];
+  saveCart();
+  update();
 }
+
+// QR WEBSITE
+new QRCode(document.getElementById("qrcode"), {
+  text: "https://your-site-link.com",
+  width: 120,
+  height: 120
+});
+
+// BUBBLES
+for(let i=0;i<20;i++){
+  let b=document.createElement("div");
+  b.className="bubble";
+  b.style.left=Math.random()*100+"vw";
+  b.style.width=b.style.height=(20+Math.random()*30)+"px";
+  b.style.animationDuration=(5+Math.random()*10)+"s";
+  document.body.appendChild(b);
+}
+
+display(products);
+update();
 </script>
 
 </body>
